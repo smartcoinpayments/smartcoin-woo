@@ -19,15 +19,20 @@ class Navaska extends WC_Payment_Gateway {
     $this->test_api_secret  = $this->get_option('test_api_secret');
     $this->live_api_key     = $this->get_option('live_api_key');
     $this->live_api_secret  = $this->get_option('live_api_secret');
+    $this->api_key          = $this->use_test_api ? $this->test_api_key : $this->live_api_key;
+    $this->api_secret       = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
 
 
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
 
+    wp_enqueue_script('the_navaska_js', 'https://js.navaska.com.br/v1/navaska.js');
+
+
   }
 
   public function check_ssl() {
-    if(!$this->use_test_api && get_option('woocommerce_force_ssl_checkout') && $this->enable == 'yes') {
+    if(!$this->use_test_api && get_option('woocommerce_force_ssl_checkout') == 'no' && $this->enabled == 'yes') {
       echo __('<div class="error"><p>Navaska test API is disable and force SSL option is disable. Please enable SSL and ensure your server has valid SSL certificate.</p></div>','woothemes');
     }
   }
