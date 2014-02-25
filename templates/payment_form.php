@@ -40,7 +40,7 @@
 </p>
 <p class="form-row form-row-last" style="width:150px;">
 <label>Código de Segurança <span class="required">*</span></label>
-<input class="input-text" type="text" size="4" maxlength="4" style="width:65px;"/>
+<input class="input-text" type="text" size="4" maxlength="4" data-navaska="cvc" style="width:65px;"/>
 </p>
 <div class="clear"></div>
 
@@ -74,6 +74,9 @@
         $('<input id="navaska_card_name" class="input-text" type="hidden" data-navaska="name" value="'+card_name+'"/>').appendTo($form);
       }
 
+      $('input[data-navaska="number"]').payment('formatCardNumber');
+      $('input[data-navaska=cvc]').payment('formatCardCVC');
+
       var navaska_response_handler = function(response) {
         if (response.error) {
           $form.find('.payment-errors').text(response.error.message);
@@ -84,9 +87,29 @@
         }
       };
 
+      var navaska_validate_payment_form = function() {
+        var msg = '';
+        if(!$.payment.validateCardNumber($('input[data-navaska="number"]').val()))
+          msg += 'Número do cartão inválido; ' ;
+
+        if(!$.payment.validateCardExpiry($('select[data-navaska="exp_month"]').val(),$('select[data-navaska="exp_year"]').val()))
+          msg += 'Data de expiração inválida; ';
+
+        if(!$.payment.validateCardCVC($('input[data-navaska="cvc"]').val()))
+          msg += 'Código de segurança inválido; ';
+
+        $form.find('.payment-errors').text(msg);
+
+        return msg.length == '';
+      };
+
       $('body').on('click', '#place_order,form#order_review input:submit', function(){
         if($('input[name=payment_method]:checked').val() != 'Navaska'){
             return true;
+        }
+
+        if(!navaska_validate_payment_form()) {
+          return false;
         }
 
         $form.find('.payment-errors').html('');
@@ -108,5 +131,10 @@
   if(typeof $=='undefined')
     $ = jQuery;
 
-  init_navaska();
+  var headTag = document.getElementsByTagName("head")[0];
+  var jqTag = document.createElement('script');
+  jqTag.type = 'text/javascript';
+  jqTag.src = 'https://js.navaska.com.br/v1/jquery.payment.js';
+  jqTag.onload = init_navaska;
+  headTag.appendChild(jqTag);
 </script>

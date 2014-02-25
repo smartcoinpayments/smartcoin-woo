@@ -27,8 +27,6 @@ class Navaska extends WC_Payment_Gateway {
     add_action('admin_notices', array(&$this, 'check_ssl'));
 
     wp_enqueue_script('the_navaska_js', 'https://js.navaska.com.br/v1/navaska.js');
-
-
   }
 
   public function check_ssl() {
