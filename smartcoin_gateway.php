@@ -1,17 +1,17 @@
 <?php
-require_once('lib/navaska-php/lib/Navaska.php');
+require_once('lib/smartcoin-php/lib/SmartCoin.php');
 
 
-class Navaska extends WC_Payment_Gateway {
+class SmartCoin extends WC_Payment_Gateway {
 
-  protected $GATEWAY_NAME               = "Navaska";
+  protected $GATEWAY_NAME               = "SmartCoin";
   protected $use_test_api               = true;
   protected $order                      = null;
   protected $transaction_id             = null;
   protected $transaction_error_message  = null;
 
   public function __construct() {
-    $this->id = 'Navaska';
+    $this->id = 'SmartCoin';
     $this->has_fields = true;
 
     $this->init_form_fields();
@@ -27,19 +27,18 @@ class Navaska extends WC_Payment_Gateway {
     $this->live_api_secret  = $this->get_option('live_api_secret');
     $this->api_key          = $this->use_test_api ? $this->test_api_key : $this->live_api_key;
     $this->api_secret       = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
-    $this->capture            = strcmp($this->settings['capture'], 'yes') == 0;
 
 
 
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
 
-    wp_enqueue_script('the_navaska_js', 'https://js.navaska.com.br/v1/navaska.js');
+    wp_enqueue_script('the_smartcoin_js', 'https://js.smartcoin.com.br/v1/smartcoin.js');
   }
 
   public function check_ssl() {
     if(!$this->use_test_api && get_option('woocommerce_force_ssl_checkout') == 'no' && $this->enabled == 'yes') {
-      echo __('<div class="error"><p>Navaska test API is disable and force SSL option is disable. Please enable SSL and ensure your server has valid SSL certificate.</p></div>','woothemes');
+      echo __('<div class="error"><p>SmartCoin test API is disable and force SSL option is disable. Please enable SSL and ensure your server has valid SSL certificate.</p></div>','woothemes');
     }
   }
 
@@ -48,19 +47,13 @@ class Navaska extends WC_Payment_Gateway {
         'enabled' => array(
             'type'        => 'checkbox',
             'title'       => __('Enable/Disable', 'woothemes'),
-            'label'       => __('Enable Navaska Credit Card Payment', 'woothemes'),
+            'label'       => __('Enable SmartCoin Credit Card Payment', 'woothemes'),
             'default'     => 'yes'
           ),
         'debug' => array(
             'type'        => 'checkbox',
             'title'       => __('Test mode (sandbox)', 'woothemes'),
             'label'       => __('Turn on the test mode', 'woothemes'),
-            'default'     => 'yes'
-          ),
-        'capture' => array(
-            'type'        => 'checkbox',
-            'title'       => __('Authorize & Capture', 'woothemes'),
-            'label'       => __('Enable Authorization and Capture', 'woothemes'),
             'default'     => 'yes'
           ),
         'title' => array(
@@ -104,7 +97,7 @@ class Navaska extends WC_Payment_Gateway {
     global $woocommerce;
     $this->order = new WC_Order( $order_id );
 
-    if ($this->navaska_processing()) {
+    if ($this->smartcoin_processing()) {
       $this->complete_order();
 
       $result = array(
@@ -119,7 +112,7 @@ class Navaska extends WC_Payment_Gateway {
     }
   }
 
-  protected function navaska_processing() {
+  protected function smartcoin_processing() {
     global $woocommerce;
 
     $api_keys = $this->api_key . ":" . $this->api_secret;
@@ -130,8 +123,7 @@ class Navaska extends WC_Payment_Gateway {
                   "amount"      => $data['amount'], // amount in cents, again
                   "currency"    => $data['currency'],
                   "card"        => $data['token'],
-                  "description" => $data['description'],
-                  "capture"     => !$this->capture
+                  "description" => $data['description']
                 ),
               $api_keys);
 
@@ -139,13 +131,12 @@ class Navaska extends WC_Payment_Gateway {
 
       update_post_meta( $this->order->id, 'transaction_id', $this->transaction_id);
       update_post_meta( $this->order->id, 'key', $this->api_key);
-      update_post_meta( $this->order->id, 'auth_capture', $this->capture);
       return true;
 
-    } catch(\Navaska\Error $e) {
+    } catch(\SmartCoin\Error $e) {
       $body = $e->get_json_body();
       $err  = $body['error'];
-      error_log('Navaska Error:' . $err['message'] . "\n");
+      error_log('SmartCoin Error:' . $err['message'] . "\n");
       $woocommerce->add_error(__('Payment error:', 'woothemes') . $err['message']);
       return false;
     }
@@ -156,7 +147,7 @@ class Navaska extends WC_Payment_Gateway {
       return array(
           "amount"      => (float)$this->order->get_total() * 100,
           "currency"    => strtolower(get_woocommerce_currency()),
-          "token"       => $_POST['navaska_token'],
+          "token"       => $_POST['smartcoin_token'],
           "description" => sprintf("Pagamento para %s", $this->order->billing_email),
           "card"        => array(
               "name"            => sprintf("%s %s", $this->order->billing_first_name, $this->order->billing_last_name),
@@ -182,7 +173,7 @@ class Navaska extends WC_Payment_Gateway {
 
     $this->order->add_order_note(
         sprintf(
-            "Pagamento processado pelo Navaska: Transação: '%s'",
+            "Pagamento processado pelo SmartCoin: Transação: '%s'",
             $this->transaction_id
         )
     );
@@ -199,9 +190,9 @@ class Navaska extends WC_Payment_Gateway {
     }
 }
 
-function navaska_add_credit_card_gateway_class( $methods ) {
-  $methods[] = 'Navaska';
+function smartcoin_add_credit_card_gateway_class( $methods ) {
+  $methods[] = 'SmartCoin';
   return $methods;
 }
 
-add_filter( 'woocommerce_payment_gateways', 'navaska_add_credit_card_gateway_class' );
+add_filter( 'woocommerce_payment_gateways', 'smartcoin_add_credit_card_gateway_class' );
