@@ -123,7 +123,8 @@ class SmartCoin extends WC_Payment_Gateway {
                   "amount"      => $data['amount'], // amount in cents, again
                   "currency"    => $data['currency'],
                   "card"        => $data['token'],
-                  "description" => $data['description']
+                  "description" => $data['description'],
+                  "reference"   => $data['reference']
                 ),
               $api_keys);
 
@@ -149,6 +150,7 @@ class SmartCoin extends WC_Payment_Gateway {
           "currency"    => strtolower(get_woocommerce_currency()),
           "token"       => $_POST['smartcoin_token'],
           "description" => sprintf("Pagamento para %s", $this->order->billing_email),
+          "reference"   => $this->order->id,
           "card"        => array(
               "name"            => sprintf("%s %s", $this->order->billing_first_name, $this->order->billing_last_name),
               "address_line1"   => $this->order->billing_address_1,
