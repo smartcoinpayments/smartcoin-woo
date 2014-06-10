@@ -208,12 +208,8 @@ class SmartCoin extends WC_Payment_Gateway {
           //'$category'       => 'Food and Grocery',
           '$quantity'       => $i->qty
         );
-
-        error_log('Sift item params:' . implode (',' , $item) . '\n');
         $items_list[] = $item;
       }
-
-      error_log('Sift item list:' . implode (',' ,$items_list) . '\n');
 
       $sift_params = array(
         '$type'             => '$create_order',
@@ -234,11 +230,6 @@ class SmartCoin extends WC_Payment_Gateway {
             '$zipcode'          => $this->order->billing_postcode,
             '$phone'            => $this->order->billing_phone
           ),
-        '$payment_methods'  => array(
-            '$payment_type'     => '$credit_card',
-            '$payment_gateway'  => '$stripe',
-            '$card_last4'       => $_POST['card_last4']
-          ),
         '$shipping_address' => array(
             '$address_1'         => $this->order->shipping_address_1,
             '$address_2'         => $this->order->shipping_address_2,
@@ -248,33 +239,25 @@ class SmartCoin extends WC_Payment_Gateway {
             '$zipcode'          => $this->order->shipping_postcode
           ),
         '$expedited_shipping' => true,
-        '$items'              => $items_list,
-        '$is_first_time_buyer' => false 
+        '$items'              => $items_list
       );
-
-      error_log('Sift params before:' . implode (',' ,$sift_params) . "\n");
-      error_log('Sift params billing:' . implode (',' ,$sift_params['$billing_address']) . "\n");
-      error_log('Sift params shipping:' . implode (',' ,$sift_params['$shipping_address']) . "\n");
-      error_log('Sift params payment:' . implode (',' ,$sift_params['$payment_methods']) . "\n");
-      error_log('Sift params items:' . implode (',' ,$sift_params['$items'][0]) . "\n");
 
       $url = 'https://api.siftscience.com/v203/events';
       $ch = curl_init($url);
-       
+
       curl_setopt($ch, CURLOPT_POST, 1);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $sift_params);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($sift_params));
       curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept: application/json"));
 
-      error_log('Sift params:' . implode (',' ,$sift_params) . "\n");
       if($response = curl_exec($ch)) {
-        unset($_COOKIE['smartcoin_sys']);
-        setcookie('smartcoin_sys', null, -1, '/');
-        error_log('Sift response: ' . $response);  
+        error_log('before unset cookie: ' .  $_COOKIE['smartcoin_sys']);
+        setcookie('smartcoin_sys', "", time()-3600);
+        error_log('Cookie: ' . $_COOKIE['smartcoin_sys']);
       }
       curl_close($ch);
       return true;
     }
-    
+
     return false;
   }
 

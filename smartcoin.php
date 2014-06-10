@@ -26,7 +26,7 @@ function sift_js() {
 	echo "
 	<script>
 		var _user_id = '';
-	  var _session_id = '" . $_COOKIE['smartcoin_sys'] . "'; 
+	  var _session_id = '" . $_COOKIE['smartcoin_sys'] . "';
 
 	  var _sift = _sift || [];
 	  _sift.push(['_setAccount', '" . $smartcoin_sys_id . "']);
@@ -52,7 +52,9 @@ function sift_js() {
 }
 
 function create_user_session() {
-  if ( !is_admin() && !isset($_COOKIE['smartcoin_sys'])) {
-      setcookie('smartcoin_sys', uniqid('sc_'), 0, COOKIEPATH, COOKIE_DOMAIN, false);
+  error_log("before set cookie" . $_COOKIE['smartcoin_sys']);
+  if (!isset($_COOKIE['smartcoin_sys'])) {
+    error_log('it will set new cookie');
+    setcookie('smartcoin_sys', uniqid('sc_'), 0, COOKIEPATH, COOKIE_DOMAIN, false);
   }
 }
