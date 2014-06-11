@@ -79,6 +79,8 @@
           $form.find('.payment-errors').text(response.error.message);
           $form.unblock();
         } else {
+          $('form.checkout').find('[name=smartcoin_session_id]').remove();
+          $('form.checkout').find('[name=smartcoin_user_id]').remove();
           $form.append($('<input type="hidden" name="smartcoin_token" />').val(response.id));
           $form.submit();
         }
@@ -118,7 +120,12 @@
         if( $form.find('[name=smartcoin_token]').length)
           return true;
 
+        if(_user_id == "") {
+          _user_id = $('#billing_email').val();
+        }
 
+        $form.append($('<input type="hidden" name="smartcoin_session_id" data-smartcoin="session_id" />').val(_session_id));
+        $form.append($('<input type="hidden" name="smartcoin_user_id" data-smartcoin="user_id" />').val(_user_id));
         $('form.checkout').find('[name=smartcoin_token]').remove();
         SmartCoin.set_api_key($('#smartcoin_api_key').data('apikey'));
         SmartCoin.create_token($form, smartcoin_response_handler);
