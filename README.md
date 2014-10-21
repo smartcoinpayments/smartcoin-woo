@@ -2,7 +2,7 @@
 
 O plugin para [WooCommerce](http://www.woothemes.com/woocommerce/) agiliza a integração da [Smartcoin](https://smartcoin.com.br/) com o WooCommerce para [Wordpress](https://wordpress.org/).
 
-**1)** Baixe o plugin [aqui]();
+**1)** Baixe o plugin [aqui](https://github.com/smartcoinpayments/smartcoin-woo/archive/master.zip);
 
 **2)** Instale o plugin no WordPress que já tenha o plugin do WooCommerce;
 
