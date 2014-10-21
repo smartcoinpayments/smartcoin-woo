@@ -6,7 +6,7 @@
  * Version: 0.1
  * Author: Arthur Granado
  * Author URI: https://www.smartcoin.com.br
- * License: MIT
+ * License: GPL2
 */
 
 function smartcoin_init_your_gateway() {
