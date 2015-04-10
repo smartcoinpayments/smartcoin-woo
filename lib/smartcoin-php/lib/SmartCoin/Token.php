@@ -1,24 +1,24 @@
 <?php
-  namespace SmartCoin;
+namespace Smartcoin;
 
-  class Token extends \SmartCoin\Object {
+  class Token extends \Smartcoin\Object {
     public static function get_request_url() {
       return "/v1/tokens/";
     }
 
-    public static function create($params=null, $api_keys) {
+    public static function create($params=null) {
       $url = self::get_request_url();
-      $r = \SmartCoin\APIRequest::request('post',$url, $api_keys, $params);
-      return new Token(json_decode($r[0],true), $api_keys);
+      $r = \Smartcoin\APIRequest::request('post',$url, \Smartcoin\Smartcoin::get_api_key(), $params);
+      return new Token(json_decode($r[0],true), \Smartcoin\Smartcoin::get_api_key());
     }
 
-    public static function retrieve($id=null, $api_keys) {
+    public static function retrieve($id=null) {
       if($id==null)
         throw new InvalidArgumentException("Token::retrieve has to have id");
 
       $url = self::get_request_url();
-      $r = \SmartCoin\APIRequest::request('get',$url.$id, $api_keys);
-      return new Token(json_decode($r[0],true), $api_keys);
+      $r = \Smartcoin\APIRequest::request('get',$url.$id, \Smartcoin\Smartcoin::access_keys());
+      return new Token(json_decode($r[0],true), \Smartcoin\Smartcoin::access_keys());
     }
   }
 ?>

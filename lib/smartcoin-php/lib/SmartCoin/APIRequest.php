@@ -1,5 +1,5 @@
 <?php
-  namespace SmartCoin;
+  namespace Smartcoin;
 
   class APIRequest {
     public static $api_base = 'https://api.smartcoin.com.br';
@@ -29,14 +29,14 @@
         case 400:
         case 404:
           $error = $json['error'];
-          throw new \SmartCoin\RequestError($error['message'], $code, $body, $json);
+          throw new \Smartcoin\RequestError($error['message'], $code, $body, $json);
         case 401:
-          throw new \SmartCoin\AuthenticationError($response[0], $code, $body, $json);
+          throw new \Smartcoin\AuthenticationError($response[0], $code, $body, $json);
         case 402:
           $error = $response['error'];
-          throw new \SmartCoin\Error($error['message'], $code, $body, $json);
+          throw new \Smartcoin\Error($error['message'], $code, $body, $json);
         default:
-          throw new \SmartCoin\Error($response[0], $code, $body, $json);
+          throw new \Smartcoin\Error($response[0], $code, $body, $json);
       }
     }
 
@@ -77,8 +77,15 @@
         }
         $opts[CURLOPT_HTTPGET] = 1;
       }
-      else{
+
+      
+      if($method == 'post'){
         $opts[CURLOPT_POST] = 1;
+        $opts[CURLOPT_POSTFIELDS] = self::encode($params);
+      }
+
+      if($method == 'delete'){
+        $opts[CURLOPT_CUSTOMREQUEST] = 'DELETE';
         $opts[CURLOPT_POSTFIELDS] = self::encode($params);
       }
 

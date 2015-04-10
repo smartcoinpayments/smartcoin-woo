@@ -1,0 +1,1 @@
+var _smartcoin_api_key = smartcoin_api_key; 

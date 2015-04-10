@@ -1,5 +1,7 @@
 <?php
-  class Fee extends \SmartCoin\Object {
+namespace Smartcoin;
+
+  class Fee extends \Smartcoin\Object {
 
   }
 ?>

@@ -1,51 +1,44 @@
 <?php
-require_once('lib/smartcoin-php/lib/SmartCoin.php');
+require_once('lib/smartcoin-php/lib/Smartcoin.php');
 
 
-class SmartCoin extends WC_Payment_Gateway {
+class Smartcoin extends WC_Payment_Gateway {
 
-  protected $GATEWAY_NAME               = "SmartCoin";
+  protected $GATEWAY_NAME               = "Smartcoin";
   protected $use_test_api               = true;
   protected $order                      = null;
   protected $transaction_id             = null;
   protected $transaction_error_message  = null;
 
   public function __construct() {
-    $this->id = 'SmartCoin';
+    $this->id = 'Smartcoin';
     $this->has_fields = true;
 
     $this->init_form_fields();
     $this->init_settings();
 
-    $this->title            = $this->get_option('title');
+    $this->title            = 'Smartcoin';
     $this->description      = '';
     $this->icon             = '';
-    $this->use_test_api     = strcmp($this->get_option('debug'),'yes') == 0;
-    $this->test_api_key     = $this->get_option('test_api_key');
-    $this->test_api_secret  = $this->get_option('test_api_secret');
-    $this->live_api_key     = $this->get_option('live_api_key');
-    $this->live_api_secret  = $this->get_option('live_api_secret');
+    $this->use_test_api     = strcmp($this->get_option('sc_debug'),'yes') == 0;
+    $this->test_api_key     = $this->get_option('sc_test_api_key');
+    $this->test_api_secret  = $this->get_option('sc_test_api_secret');
+    $this->live_api_key     = $this->get_option('sc_live_api_key');
+    $this->live_api_secret  = $this->get_option('sc_live_api_secret');
     $this->api_key          = $this->use_test_api ? $this->test_api_key : $this->live_api_key;
     $this->api_secret       = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
-
-    //tmp fields
-    $this->test_sift_account = $this->get_option('test_sift_account');
-    $this->test_sift_api_key = $this->get_option('test_sift_api_key');
-    $this->live_sift_account = $this->get_option('live_sift_account');
-    $this->live_sift_api_key = $this->get_option('live_sift_api_key');
-    $this->sift_account      = $this->use_test_api ? $this->test_sift_account : $this->live_sift_account;
-    $this->sift_api_key      = $this->use_test_api ? $this->test_sift_api_key : $this->live_sift_api_key;
 
 
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
-
-    wp_enqueue_script('the_smartcoin_js', 'https://js.smartcoin.com.br/v1/smartcoin.js');
+    update_option('sc_debug', $this->get_option('sc_debug'));
+    update_option('sc_test_api_key', $this->test_api_key);
+    update_option('sc_live_api_key', $this->live_api_key);
   }
 
   public function check_ssl() {
     if(!$this->use_test_api && get_option('woocommerce_force_ssl_checkout') == 'no' && $this->enabled == 'yes') {
-      echo __('<div class="error"><p>SmartCoin test API is disable and force SSL option is disable. Please enable SSL and ensure your server has valid SSL certificate.</p></div>','woothemes');
+      echo __('<div class="error"><p>Smartcoin test API is disable and force SSL option is disable. Please enable SSL and ensure your server has valid SSL certificate.</p></div>','woothemes');
     }
   }
 
@@ -54,60 +47,33 @@ class SmartCoin extends WC_Payment_Gateway {
         'enabled' => array(
             'type'        => 'checkbox',
             'title'       => __('Enable/Disable', 'woothemes'),
-            'label'       => __('Enable SmartCoin Credit Card Payment', 'woothemes'),
+            'label'       => __('Enable Smartcoin Credit Card Payment', 'woothemes'),
             'default'     => 'yes'
           ),
-        'debug' => array(
+        'sc_debug' => array(
             'type'        => 'checkbox',
             'title'       => __('Test mode (sandbox)', 'woothemes'),
             'label'       => __('Turn on the test mode', 'woothemes'),
             'default'     => 'yes'
           ),
-        'title' => array(
-            'type'        => 'text',
-            'title'       => __('Title on Checkout Form', 'woothemes'),
-            'description' => __('This controls the title which the user sees during checkout.', 'woothemes'),
-            'default'     => __('Cartão de Crédito', 'woothemes')
-          ),
-        'test_api_key' => array(
+        'sc_test_api_key' => array(
             'type'        => 'text',
             'title'       => __('Test API Key', 'woothemes'),
             'default'     => __('','woothemes')
           ),
-        'test_api_secret' => array(
-            'type'        => 'text',
+        'sc_test_api_secret' => array(
+            'type'        => 'password',
             'title'       => __('Test API Secret', 'woothemes'),
             'default'     => __('','woothemes')
           ),
-        'live_api_key' => array(
+        'sc_live_api_key' => array(
             'type'        => 'text',
             'title'       => __('Live API Key', 'woothemes'),
             'default'     => __('','woothemes')
           ),
-        'live_api_secret' => array(
-            'type'        => 'text',
+        'sc_live_api_secret' => array(
+            'type'        => 'password',
             'title'       => __('Live API Secret', 'woothemes'),
-            'default'     => __('','woothemes')
-          ),
-        //temp field
-        'test_sift_account' => array(
-            'type'        => 'text',
-            'title'       => __('Test Sift Account', 'woothemes'),
-            'default'     => __('','woothemes')
-          ),
-        'test_sift_api_key' => array(
-            'type'        => 'text',
-            'title'       => __('Test Sift API Key', 'woothemes'),
-            'default'     => __('','woothemes')
-          ),
-        'live_sift_account' => array(
-            'type'        => 'text',
-            'title'       => __('Live Sift Account', 'woothemes'),
-            'default'     => __('','woothemes')
-          ),
-        'live_sift_api_key' => array(
-            'type'        => 'text',
-            'title'       => __('Live Sift API Key', 'woothemes'),
             'default'     => __('','woothemes')
           )
       );
@@ -136,45 +102,64 @@ class SmartCoin extends WC_Payment_Gateway {
     }
     else{
       $this->mark_as_failed_payment();
-      $woocommerce->add_error(__('Transaction Error: Could not complete your payment'), 'woothemes');
     }
   }
 
   protected function smartcoin_processing() {
     global $woocommerce;
 
-    $api_keys = $this->api_key . ":" . $this->api_secret;
-    $data = $this->get_params();
-
     try {
-      $this->send_data_to_sift();
-      $charge = Charge::create(array(
-                  "amount"      => $data['amount'], // amount in cents, again
-                  "currency"    => $data['currency'],
-                  "card"        => $data['token'],
-                  "description" => $data['description'],
-                  "reference"   => $data['reference']
-                ),
-              $api_keys);
+      $data = $this->get_params();
 
-      $this->transaction_id = $charge['id'];
+      \Smartcoin\Smartcoin::api_key($this->api_key);
+      \Smartcoin\Smartcoin::api_secret($this->api_secret);
 
-      update_post_meta( $this->order->id, 'transaction_id', $this->transaction_id);
-      update_post_meta( $this->order->id, 'key', $this->api_key);
-      return true;
-
-    } catch(\SmartCoin\Error $e) {
+      if($data['smartcoin_payment_method_type'] == 'credit_card'){
+        $charge = \Smartcoin\Charge::create(array(
+                  'amount' => $data['amount'],
+                  'currency' => 'brl',
+                  'card' => $data['token'],
+                  'description' => $data['description'],
+                  'reference'   => $data['reference']
+                ));  
+        if($charge->paid){
+          $this->charge = $charge;
+          $this->transaction_id = $charge['id'];
+          return true;  
+        }else {
+          $error_message = ' Desculpe, mas não conseguimos processar o seu cartão. Por favor, tente novamente com outro cartão de crédito.';
+          $this->transaction_error_message = $error_message;
+          wc_add_notice( __('Payment error:', 'woothemes') . $error_message, 'error' );
+          return;
+        }
+      }else {
+        $charge = \Smartcoin\Charge::create(array(
+            'amount' => $data['amount'],
+            'currency' => 'brl',
+            'type' => 'bank_slip',
+            'description' => $data['description'],
+            'reference'   => $data['reference']
+          ));  
+      
+        $this->charge = $charge;
+        $this->transaction_id = $charge['id'];
+        return true;  
+      }
+      
+    } catch(\Smartcoin\Error $e) {
       $body = $e->get_json_body();
       $err  = $body['error'];
-      error_log('SmartCoin Error:' . $err['message'] . "\n");
-      $woocommerce->add_error(__('Payment error:', 'woothemes') . $err['message']);
-      return false;
+      error_log('Smartcoin Error:' . $err['message'] . "\n");
+      $this->transaction_error_message = 'Smartcoin Error:' . $err['message'] . "\n";
+      wc_add_notice( __('Payment error:', 'woothemes') . $err['message'], 'error' );
+      return;
     }
   }
 
   protected function get_params() {
     if ($this->order AND $this->order != null) {
       return array(
+          "smartcoin_payment_method_type" => $_POST['smartcoin_payment_method'],
           "amount"      => $this->order->get_total() * 100,
           "currency"    => strtolower(get_woocommerce_currency()),
           "token"       => $_POST['smartcoin_token'],
@@ -193,89 +178,78 @@ class SmartCoin extends WC_Payment_Gateway {
     return false;
   }
 
-  protected function send_data_to_sift() {
-    if ($this->order AND $this->order != null) {
-      $items_list = array();
-      error_log('Sift order params:' . $this->order->id . "\n");
-      foreach ($this->order->get_items() as $i ) {
-        $item = array(
-          '$item_id'        => $i->item_meta,
-          '$product_title'  => $i->name,
-          '$price'          => $i->line_total * 1000000,
-          //'$upc'            => '097564307560',
-          //'$sku'            => '03586005',
-          //'$brand'          => 'Peters Kettle Corn',
-          //'$category'       => 'Food and Grocery',
-          '$quantity'       => $i->qty
-        );
-        $items_list[] = $item;
-      }
-
-      $sift_params = array(
-        '$type'             => '$create_order',
-        '$api_key'          => $this->sift_api_key,
-        '$session_id'       => $_COOKIE['smartcoin_sys'],
-        '$user_id'          => $this->order->billing_email,
-        '$order_id'         => $this->order->id,
-        '$user_email'       => $this->order->billing_email,
-        '$amount'           => $this->order->get_total() * 1000000,
-        '$currency_code'    => strtolower(get_woocommerce_currency()),
-        '$billing_address'  => array(
-            '$name'             => sprintf("%s %s", $this->order->billing_first_name, $this->order->billing_last_name),
-            '$address_1'         => $this->order->billing_address_1,
-            '$address_2'         => $this->order->billing_address_2,
-            '$city'             => $this->order->billing_city,
-            '$region'           => $this->order->billing_state,
-            '$country'          => $this->order->billing_country,
-            '$zipcode'          => $this->order->billing_postcode,
-            '$phone'            => $this->order->billing_phone
-          ),
-        '$shipping_address' => array(
-            '$address_1'         => $this->order->shipping_address_1,
-            '$address_2'         => $this->order->shipping_address_2,
-            '$city'             => $this->order->shipping_city,
-            '$region'           => $this->order->shipping_state,
-            '$country'          => $this->order->shipping_country,
-            '$zipcode'          => $this->order->shipping_postcode
-          ),
-        '$expedited_shipping' => true,
-        '$items'              => $items_list
-      );
-
-      $url = 'https://api.siftscience.com/v203/events';
-      $ch = curl_init($url);
-
-      curl_setopt($ch, CURLOPT_POST, 1);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($sift_params));
-      curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept: application/json"));
-
-      if($response = curl_exec($ch)) {
-        error_log('before unset cookie: ' .  $_COOKIE['smartcoin_sys']);
-        setcookie('smartcoin_sys', "", time()-3600);
-        error_log('Cookie: ' . $_COOKIE['smartcoin_sys']);
-      }
-      curl_close($ch);
-      return true;
-    }
-
-    return false;
-  }
-
   protected function complete_order() {
     global $woocommerce;
 
     if ($this->order->status == 'completed')
         return;
 
-    $this->order->payment_complete();
-    $woocommerce->cart->empty_cart();
+    $fee = 0;
+    foreach ($this->charge->fees as $fee){
+      $fee += $fee->amount;
+    }
+    $fee = $fee / 100.0;
 
-    $this->order->add_order_note(
+    $status = ($this->charge->paid ? 'Pago' : 'Pendente');
+    $processed = gmdate('d-m-Y h:i:s',$this->charge->created);
+    $mode = (strcmp($this->get_option('sc_debug'),'yes') == 0 ? 'test' : 'live' );
+    $type = ($this->charge->type == 'credit_card' ? 'Cartão de Crédito' : 'Boleto Bancário');
+
+    if($this->charge->type == 'credit_card'){
+      $this->order->payment_complete();
+      $this->order->add_order_note(
         sprintf(
-            "Pagamento processado pelo SmartCoin: Transação: '%s'",
-            $this->transaction_id
+          "Smartcoin Transaction Details: \n
+          Tipo: %s
+          Smartcoin ID: %s
+          Amount: R$ %.2f
+          Status: %s
+          Processed on: %s
+          Currency: BRL
+          Credit card: %s (Exp.: %s/%s)
+          Installments: %s
+          Processing Fee: R$ %.2f
+          Mode: %s
+          ",
+          $type,
+          $this->charge->id,
+          $this->charge->amount / 100.0,
+          $status,
+          $processed,
+          $this->charge->card->type,
+          $this->charge->card->exp_month,
+          $this->charge->card->exp_year,
+          $this->charge->installments,
+          $fee,
+          $mode
         )
-    );
+      );
+    }
+    else {
+      $this->order->add_order_note(
+        sprintf(
+          "Smartcoin Transaction Details: \n
+          Tipo: %s
+          Smartcoin ID: %s
+          Amount: R$ %.2f
+          Status: %s
+          Processed on: %s
+          Currency: BRL
+          Processing Fee: R$ %.2f
+          Mode: %s
+          ",
+          $type,
+          $this->charge->id,
+          $this->charge->amount / 100.0,
+          $status,
+          $processed,
+          $fee,
+          $mode
+        )
+      );
+    }
+
+    $woocommerce->cart->empty_cart();
     unset($_SESSION['order_awaiting_payment']);
   }
 
@@ -290,7 +264,7 @@ class SmartCoin extends WC_Payment_Gateway {
 }
 
 function smartcoin_add_credit_card_gateway_class( $methods ) {
-  $methods[] = 'SmartCoin';
+  $methods[] = 'Smartcoin';
   return $methods;
 }
 

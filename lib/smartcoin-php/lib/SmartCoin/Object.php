@@ -1,21 +1,23 @@
 <?php
-  namespace SmartCoin;
+  namespace Smartcoin;
 
   class Object implements \ArrayAccess {
     protected $api_keys;
     protected $_values;
+    protected $_unsavedValues;
 
     public function __construct($params=null, $api_keys=null) {
       $this->_values = array();
+      $this->_unsavedValues = array();
 
-      $this->reflesh_object($params,$api_keys);
+      $this->refresh_object($params,$api_keys);
 
       if($api_keys) {
         $this->api_keys = $api_keys;
       }
     }
 
-    public function reflesh_object($params=null,$api_keys=null) {
+    public function refresh_object($params=null,$api_keys=null) {
       if($params) {
         foreach($params as $key => $value) {
           if(is_array($value) && array_key_exists('object',$value)) {
@@ -33,6 +35,7 @@
             }
             else {
               $this->_values[$key] = $value;
+              unset($this->_unsavedValues[$key]);
             }
           }
         }
@@ -40,28 +43,77 @@
     }
 
     public static function get_object_by_type($type) {
-      $object_type = "SmartCoin_Object";
+      $object_type = "\Smartcoin\Smartcoin_Object";
       switch ($type) {
         case 'token':
-            $object_type = 'Token';
+            $object_type = '\Smartcoin\Token';
             break;
         case 'card':
-            $object_type = 'Card';
+            $object_type = '\Smartcoin\Card';
             break;
         case 'charge':
-            $object_type = 'Charge';
+            $object_type = '\Smartcoin\Charge';
             break;
         case 'refund':
-            $object_type = 'Refund';
+            $object_type = '\Smartcoin\Refund';
             break;
         case 'fee':
-            $object_type = 'Fee';
+            $object_type = '\Smartcoin\Fee';
             break;
         case 'installment':
-            $object_type = 'Installment';
+            $object_type = '\Smartcoin\Installment';
+            break;
+        case 'customer':
+            $object_type = '\Smartcoin\Customer';
+            break;
+        case 'plan':
+            $object_type = '\Smartcoin\Plan';
+            break;
+        case 'subscription':
+            $object_type = '\Smartcoin\Subscription';
             break;
       }
       return $object_type;
+    }
+
+    public function serializeParamenters(){
+      $result = array();
+      foreach ($this->_unsavedValues as $k => $v) {
+        if($this->_unsavedValues[$k]) {
+          $result[$k] = $this->_values[$k];  
+        }
+        
+      }
+      return $result;
+    }
+
+    public function to_string(){
+      return $this->to_json();
+    }
+    
+    public function to_json(){
+      return json_encode($this->to_array());
+    }
+
+    //wrap method to get the Object values array not formatted
+    public function to_array(){
+      $results = array();
+
+      foreach ($this->_values as $k => $v) {
+        if($v instanceof Object){
+          $results[$k] = $v->to_array();
+        }else if(is_array($v)){
+          $results_2 = array();
+          foreach ($v as $v2) {
+            $results_2[] = $v2->to_array();
+          }
+          $results[$k] = $results_2;
+        }else{
+          $results[$k] = $v;
+        }
+      }
+
+      return $results;
     }
 
     // Standard accessor magic methods
@@ -73,6 +125,7 @@
           .'You may set obj->'.$k.' = NULL to delete the property');
       }
       $this->_values[$k] = $v;
+      $this->_unsavedValues[$k] = true;
     }
 
     public function __isset($k) {
@@ -81,6 +134,7 @@
 
     public function __unset($k) {
       unset($this->_values[$k]);
+      unset($this->_unsavedValues[$k]);
     }
 
     public function __get($k) {

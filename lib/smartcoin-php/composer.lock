@@ -3,10 +3,8 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "f5379b91a345ec514226f5b7d7229b09",
-    "packages": [
-
-    ],
+    "hash": "a5701cbdf0bb8bcbd98624621b0bbe4c",
+    "packages": [],
     "packages-dev": [
         {
             "name": "simpletest/simpletest",
@@ -81,17 +79,13 @@
             "time": "2013-09-21 21:04:19"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": [],
     "platform": {
-        "php": ">=5.3"
+        "php": ">=5.3",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }

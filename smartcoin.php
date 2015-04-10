@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: SmartCoin (payment Gateway)
- * Plugin URI: https://www.smartcoin.com.br
- * Description: Provides payment method for credit card through SmartCoin to WooCommerce.
- * Version: 0.1
+ * Plugin Name: Smartcoin (payment Gateway)
+ * Plugin URI: https://smartcoin.com.br
+ * Description: Provides payment method for credit card through Smartcoin to WooCommerce.
+ * Version: 0.2.0
  * Author: Arthur Granado
- * Author URI: https://www.smartcoin.com.br
+ * Author URI: https://smartcoin.com.br
  * License: GPL2
 */
 
@@ -16,45 +16,15 @@ function smartcoin_init_your_gateway() {
 }
 
 add_action('plugins_loaded', 'smartcoin_init_your_gateway',0);
+add_action('admin_init', 'register_and_build_fields');
 
-wp_enqueue_script( 'sift_science', sift_js(), array( 'jquery' ));
-
-function sift_js() {
-	create_user_session();
-	$smartcoin_sys_id = 'bf65ad0591';
-
-	echo "
-	<script>
-		var _user_id = '';
-	  var _session_id = '" . $_COOKIE['smartcoin_sys'] . "';
-
-	  var _sift = _sift || [];
-	  _sift.push(['_setAccount', '" . $smartcoin_sys_id . "']);
-	  _sift.push(['_setUserId', _user_id]);
-	  _sift.push(['_setSessionId', _session_id]);
-	  _sift.push(['_trackPageview']);
-	  (function() {
-	    function ls() {
-	      var e = document.createElement('script');
-	      e.type = 'text/javascript';
-	      e.async = true;
-	      e.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.siftscience.com/s.js';
-	      var s = document.getElementsByTagName('script')[0];
-	      s.parentNode.insertBefore(e, s);
-	    }
-	    if (window.attachEvent) {
-	      window.attachEvent('onload', ls);
-	    } else {
-	      window.addEventListener('load', ls, false);
-	    }
-	  })();
-	</script>";
+function register_and_build_fields() {
+	register_setting('smartcoin_options', 'sc_debug');
+	register_setting('smartcoin_options', 'sc_test_api_key');
+	register_setting('smartcoin_options', 'sc_live_api_key');
 }
 
-function create_user_session() {
-  error_log("before set cookie" . $_COOKIE['smartcoin_sys']);
-  if (!isset($_COOKIE['smartcoin_sys'])) {
-    error_log('it will set new cookie');
-    setcookie('smartcoin_sys', uniqid('sc_'), 0, COOKIEPATH, COOKIE_DOMAIN, false);
-  }
-}
+wp_enqueue_script( 'smartcoin_api_key',  plugin_dir_url(__FILE__) . '/js/smartcoin_api_key.js', array( 'jquery'));
+wp_localize_script( 'smartcoin_api_key', 'smartcoin_api_key', ((strcmp(get_option('sc_debug'),'yes') == 0) ? get_option('sc_test_api_key') : get_option('sc_live_api_key')));
+wp_enqueue_script( 'smartcoin_js',  plugin_dir_url(__FILE__) . '/js/smartcoin.js', array( 'jquery', 'smartcoin_api_key' ));
+wp_enqueue_script( 'smartcoin_checkout_form_js',  plugin_dir_url(__FILE__) . '/js/smartcoin_checkout_form.js', array( 'jquery', 'smartcoin_api_key', 'smartcoin_js'), false, true);
