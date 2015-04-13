@@ -1,5 +1,5 @@
 <?php
-require_once(plugin_dir_url(__FILE__) . 'lib/smartcoin-php/lib/Smartcoin.php');
+require_once('lib/smartcoin-php/lib/Smartcoin.php');
 
 
 class Smartcoin extends WC_Payment_Gateway {
