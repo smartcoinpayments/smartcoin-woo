@@ -120,5 +120,5 @@
         $("#smartcoin_credit_card_section").hide();
       }
     });
-  }, 500);
+  }, 1500);
 });
