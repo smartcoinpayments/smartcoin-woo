@@ -16,6 +16,9 @@ class Smartcoin extends WC_Payment_Gateway {
 
     $this->init_form_fields();
     $this->init_settings();
+    $this->supports = array(
+        'refunds'
+      );
 
     $this->title            = 'Smartcoin';
     $this->description      = '';
@@ -182,7 +185,7 @@ class Smartcoin extends WC_Payment_Gateway {
     global $woocommerce;
 
     if ($this->order->status == 'completed')
-        return;
+      return;
 
     $fee = 0;
     foreach ($this->charge->fees as $fee){
@@ -196,7 +199,7 @@ class Smartcoin extends WC_Payment_Gateway {
     $type = ($this->charge->type == 'credit_card' ? 'Cartão de Crédito' : 'Boleto Bancário');
 
     if($this->charge->type == 'credit_card'){
-      $this->order->payment_complete();
+      $this->order->payment_complete($this->transaction_id);
       $this->order->add_order_note(
         sprintf(
           "Smartcoin Transaction Details: \n
@@ -254,13 +257,84 @@ class Smartcoin extends WC_Payment_Gateway {
   }
 
   protected function mark_as_failed_payment() {
-      $this->order->add_order_note(
-          sprintf(
-            "O Pagamento com Cartão Falhou com a seguinte mensagem: '%s'",
-            $this->transaction_error_message
-          )
+    $this->order->add_order_note(
+        sprintf(
+          "O Pagamento com Cartão Falhou com a seguinte mensagem: '%s'",
+          $this->transaction_error_message
+        )
+    );
+  }
+
+  /**
+   * Process refund
+   *
+   * Overriding refund method
+   *
+   * @access      public
+   * @param       int $order_id
+   * @param       float $amount
+   * @param       string $reason
+   * @return      mixed True or False based on success, or WP_Error
+   */
+  public function process_refund($order_id, $amount = null, $reason = '') {
+    $this->order = new WC_Order($order_id);
+    $this->transaction_id = $this->order->get_transaction_id();
+
+    if (!$this->transaction_id) {
+      return new WP_Error( 'scwc_refund_error',
+        sprintf(
+          __( '%s Credit Card Refund failed because the Transaction ID is missing.', 'smartcoin-woo' ),
+          get_class( $this )
+        )
       );
     }
+
+    try {
+      $refund_data = array();
+      // If the amount is set, refund that amount, otherwise the entire amount is refunded
+      if($amount){
+        $refund_data['amount'] = $amount * 100;
+      }
+      // If a reason is provided, add it to the Smartcoin metadata for the refund
+      // if($reason){
+      //   $refund_data['metadata']['reason'] = $reason;
+      // }
+
+      \Smartcoin\Smartcoin::api_key($this->api_key);
+      \Smartcoin\Smartcoin::api_secret($this->api_secret);
+      $ch = \Smartcoin\Charge::retrieve($this->transaction_id);
+      // Send the refund to the Smartcoin API
+      $ch->refund($refund_data);
+      return $ch->to_json();
+    } catch(\Smartcoin\RequestError $e) {
+      $body = $e->get_json_body();
+      $err  = $body['error'];
+      $this->transaction_error_message = $err['message'];
+      $this->order->add_order_note(
+        sprintf(
+          __( '%s Credit Card Refund Failed with message: "%s"', 'smartcoin-woo' ),
+          get_class( $this ),
+          $this->transaction_error_message
+        )
+      );
+      return new WP_Error( 'scwc_refund_error', $this->transaction_error_message );
+    } catch(\Smartcoin\Error $e) {
+      $body = $e->get_json_body();
+      $err  = $body['error'];
+      $this->transaction_error_message = $err['message'];
+      $this->order->add_order_note(
+        sprintf(
+          __( '%s Credit Card Refund Failed with message: "%s"', 'smartcoin-woo' ),
+          get_class( $this ),
+          $this->transaction_error_message
+        )
+      );
+      return new WP_Error( 'scwc_refund_error', $this->transaction_error_message );
+    } catch(Exception $e) {
+      return new WP_Error( 'scwc_refund_error', $e->getMessage());
+    }
+    return false;
+  }
 }
 
 function smartcoin_add_credit_card_gateway_class( $methods ) {
