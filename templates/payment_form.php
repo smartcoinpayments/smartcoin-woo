@@ -6,13 +6,13 @@
 
 <!-- Bank Slip Form -->
 <input type="radio" id="smartcoin_payment_method_bank_slip" name="smartcoin_payment_method" value="bank_slip" >
-<label>Boleto Bancário</label></br>
+<label for="smartcoin_payment_method_bank_slip">Boleto Bancário</label></br>
 <section id="smartcoin_bank_slip_section"  style="display: none;">
 </section>
 
 <!-- Credit Card Form -->
 <input type="radio" id="smartcoin_payment_method_credit_card" name="smartcoin_payment_method" value="credit_card" checked> 
-<label>Cartão de Crédito</label></br>
+<label for="smartcoin_payment_method_credit_card">Cartão de Crédito</label></br>
 <section id="smartcoin_credit_card_section">
   <span class="payment-errors required"></span>
   <p class="form-row">
