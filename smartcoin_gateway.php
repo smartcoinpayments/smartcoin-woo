@@ -197,6 +197,7 @@ class Smartcoin extends WC_Payment_Gateway {
     $processed = gmdate('d-m-Y h:i:s',$this->charge->created);
     $mode = (strcmp($this->get_option('sc_debug'),'yes') == 0 ? 'test' : 'live' );
     $type = ($this->charge->type == 'credit_card' ? 'Cartão de Crédito' : 'Boleto Bancário');
+    update_post_meta( $this->order->id, 'charge_type', $this->charge->type);
 
     if($this->charge->type == 'credit_card'){
       $this->order->payment_complete($this->transaction_id);
@@ -229,6 +230,8 @@ class Smartcoin extends WC_Payment_Gateway {
       );
     }
     else {
+      update_post_meta( $this->order->id, 'bank_slip_number', $this->charge->bank_slip->bar_code);
+      update_post_meta( $this->order->id, 'bank_slip_link', $this->charge->bank_slip->link);
       $this->order->add_order_note(
         sprintf(
           "Smartcoin Transaction Details: \n
@@ -342,4 +345,40 @@ function smartcoin_add_credit_card_gateway_class( $methods ) {
   return $methods;
 }
 
-add_filter( 'woocommerce_payment_gateways', 'smartcoin_add_credit_card_gateway_class' );
+function add_order_email_instructions($order, $sent_to_admin) {
+  if(!$sent_to_admin){
+    if(get_post_meta( $order->id, 'charge_type', true) == 'bank_slip') {
+      $output = "<p><". _e( 'Your bank slip bar code is:', 'woocommerce' ) . "</p>";
+      $output .= "<strong>" . get_post_meta( $order->id, 'bank_slip_number', true) . "</strong>";
+      $output .= "<p><a href='" . get_post_meta( $order->id, 'bank_slip_link', true) . "' target='_blank' class='button pay'>" .  _e( 'Print Bank Slip', 'smartcoin' ) . "</a></p>";
+      echo $output;
+    }
+  }
+}
+
+function smartcoin_woocommerce_locate_template( $template, $template_name, $template_path ) {
+  global $woocommerce;
+ 
+  $_template = $template;
+  if ( ! $template_path ) $template_path = $woocommerce->template_url;
+  $plugin_path  = untrailingslashit( plugin_dir_path( __FILE__ ) ) . '/woocommerce/';
+ 
+  // Look within passed path within the theme - this is priority
+  $template = locate_template(
+    array(
+      $template_path . $template_name,
+      $template_name
+    )
+  );
+ 
+  // Modification: Get the template from this plugin, if it exists
+  if ( ! $template && file_exists( $plugin_path . $template_name ) )
+    $template = $plugin_path . $template_name;
+ 
+  // Use default template
+  if ( ! $template )
+    $template = $_template;
+
+  // Return what we found
+  return $template;
+}

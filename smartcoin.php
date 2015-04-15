@@ -17,7 +17,11 @@ function smartcoin_init_your_gateway() {
 
 add_action('plugins_loaded', 'smartcoin_init_your_gateway',0);
 add_action('admin_init', 'register_and_build_fields');
-add_action( 'wp_enqueue_scripts', 'enqueue_script_and_styles',5 );
+add_action('wp_enqueue_scripts', 'enqueue_script_and_styles',5 );
+add_action('woocommerce_email_before_order_table', 'add_order_email_instructions', 10, 2 );
+
+add_filter('woocommerce_locate_template', 'smartcoin_woocommerce_locate_template', 10, 3 );
+add_filter('woocommerce_payment_gateways', 'smartcoin_add_credit_card_gateway_class' );
 
 function register_and_build_fields() {
 	register_setting('smartcoin_options', 'sc_debug');
