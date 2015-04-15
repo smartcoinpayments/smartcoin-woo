@@ -1,7 +1,8 @@
  $ = jQuery;
  $(window).load(function() {
   var $form = $('form.checkout,form#order_review');
-  
+  var installments = 1;
+
   var smartcoin_payment_method_selected = function() {
     var result = 'credit_card';
     if($("#smartcoin_payment_method_bank_slip").attr("checked")) {
@@ -36,6 +37,8 @@
     } else {
       $('form.checkout').find('[name=smartcoin_session_id]').remove();
       $('form.checkout').find('[name=smartcoin_user_id]').remove();
+      debugger;
+      $form.append($('<input type="hidden" name="smartcoin_installments" />').val(installments));
       $form.append($('<input type="hidden" name="smartcoin_token" />').val(response.id));
       $form.submit();
     }
@@ -56,6 +59,12 @@
       _user_id = $('#billing_email').val();
     }
 
+    debugger;
+    if($('form.checkout').find('[name=smartcoin_installments]')){
+      installments = $('form.checkout').find('[name=smartcoin_installments]').val();
+      $('form.checkout').find('[name=smartcoin_installments]').remove();
+    }
+
     form.append($('<input type="hidden" name="smartcoin_session_id" data-smartcoin="session_id" />').val(_session_id));
     form.append($('<input type="hidden" name="smartcoin_user_id" data-smartcoin="user_id" />').val(_user_id));
     $('form.checkout').find('[name=smartcoin_token]').remove();
@@ -68,6 +77,14 @@
   }
 
   var smartcoin_setting_credit_card_form = function() {
+    $('form[name="checkout"]').card({
+      container: $('.smartcoin-card-wrapper'),
+      numberInput: 'input[data-smartcoin="number"]',
+      expiryInput: 'select[data-smartcoin="exp_month"],select[data-smartcoin="exp_year"]',
+      cvcInput: 'input[data-smartcoin="cvc"]',
+      nameInput: 'input[data-smartcoin="name"]',
+    });
+
     var smartcoin_map = {
 
       billing_address_1:  'address_line1',
@@ -81,7 +98,7 @@
     $('form.checkout').find('input[id*=billing_],select[id*=billing_]').each(function(idx,el) {
       var mapped = smartcoin_map[el.id];
       if (mapped) {
-          $(el).attr('data-smartcoin',mapped);
+        $(el).attr('data-smartcoin',mapped);
       }
     });
 

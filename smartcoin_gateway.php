@@ -20,17 +20,18 @@ class Smartcoin extends WC_Payment_Gateway {
         'refunds'
       );
 
-    $this->title            = 'Smartcoin';
-    $this->description      = '';
-    $this->icon             = '';
-    $this->use_test_api     = strcmp($this->get_option('sc_debug'),'yes') == 0;
-    $this->test_api_key     = $this->get_option('sc_test_api_key');
-    $this->test_api_secret  = $this->get_option('sc_test_api_secret');
-    $this->live_api_key     = $this->get_option('sc_live_api_key');
-    $this->live_api_secret  = $this->get_option('sc_live_api_secret');
-    $this->api_key          = $this->use_test_api ? $this->test_api_key : $this->live_api_key;
-    $this->api_secret       = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
-
+    $this->title                = 'Smartcoin';
+    $this->description          = '';
+    $this->icon                 = '';
+    $this->use_test_api         = strcmp($this->get_option('sc_debug'),'yes') == 0;
+    $this->test_api_key         = $this->get_option('sc_test_api_key');
+    $this->test_api_secret      = $this->get_option('sc_test_api_secret');
+    $this->live_api_key         = $this->get_option('sc_live_api_key');
+    $this->live_api_secret      = $this->get_option('sc_live_api_secret');
+    $this->api_key              = $this->use_test_api ? $this->test_api_key : $this->live_api_key;
+    $this->api_secret           = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
+    $this->allowInstallments    = strcmp($this->get_option('sc_allow_installments'),'yes') == 0;
+    $this->numberOfInstallments = $this->get_option('sc_number_of_installments');
 
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
@@ -78,6 +79,16 @@ class Smartcoin extends WC_Payment_Gateway {
             'type'        => 'password',
             'title'       => __('Live API Secret', 'woothemes'),
             'default'     => __('','woothemes')
+          ),
+        'sc_allow_installments' => array(
+            'type'        => 'checkbox',
+            'title'       => __('Allow Installments', 'woothemes'),
+            'default'     => __('yes','woothemes')
+          ),
+        'sc_number_of_installments' => array(
+            'type'        => 'number',
+            'title'       => __('Number max of installments', 'woothemes'),
+            'default'     => __(6,'woothemes')
           )
       );
   }
@@ -123,7 +134,8 @@ class Smartcoin extends WC_Payment_Gateway {
                   'currency' => 'brl',
                   'card' => $data['token'],
                   'description' => $data['description'],
-                  'reference'   => $data['reference']
+                  'reference'   => $data['reference'],
+                  'installment' => $data['installments']
                 ));  
         if($charge->paid){
           $this->charge = $charge;
@@ -166,6 +178,7 @@ class Smartcoin extends WC_Payment_Gateway {
           "amount"      => $this->order->get_total() * 100,
           "currency"    => strtolower(get_woocommerce_currency()),
           "token"       => $_POST['smartcoin_token'],
+          "installments"       => $_POST['smartcoin_installments'],
           "description" => sprintf("Pagamento para %s", $this->order->billing_email),
           "reference"   => $this->order->id,
           "card"        => array(
