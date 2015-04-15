@@ -6,14 +6,16 @@
 
 <!-- Bank Slip Form -->
 <input type="radio" id="smartcoin_payment_method_bank_slip" name="smartcoin_payment_method" value="bank_slip" >
-<label>Boleto Bancário</label></br>
+<label for="smartcoin_payment_method_bank_slip">Boleto Bancário</label></br>
 <section id="smartcoin_bank_slip_section"  style="display: none;">
 </section>
 
 <!-- Credit Card Form -->
 <input type="radio" id="smartcoin_payment_method_credit_card" name="smartcoin_payment_method" value="credit_card" checked> 
-<label>Cartão de Crédito</label></br>
+<label for="smartcoin_payment_method_credit_card">Cartão de Crédito</label></br>
 <section id="smartcoin_credit_card_section">
+  <div class="smartcoin-card-wrapper" ></div>
+  <div class="clear"></div>
   <span class="payment-errors required"></span>
   <p class="form-row">
     <label>Número do Cartão <span class="required">*</span></label>
@@ -57,6 +59,16 @@
   <p class="form-row form-row-last" style="width:150px;">
   <label>Código de Segurança <span class="required">*</span></label>
   <input class="input-text" type="text" data-smartcoin="cvc" style="width:65px;"/>
+    <?php if($this->allowInstallments){ ?>
+    <label>Parcelas<span class="required">*</span></label>
+    <select name="smartcoin_installments" data-smartcoin="installments" >
+      <?php
+        for($i = 1; $i < ($this->numberOfInstallments+1); $i++) {
+          echo "<option value=${i}>${i}</option>";
+        }
+      ?>
+    </select>
+  <?php }?>
   </p>
   <div class="clear"></div>
 </section>
