@@ -245,6 +245,11 @@ class Smartcoin extends WC_Payment_Gateway {
     else {
       update_post_meta( $this->order->id, 'bank_slip_number', $this->charge->bank_slip->bar_code);
       update_post_meta( $this->order->id, 'bank_slip_link', $this->charge->bank_slip->link);
+
+      $this->order->update_status('on-hold', __('Pending payment', 'smartcoin'));
+      $this->msg['message'] = "Thank you for shopping with us. Right now your payment staus is pending, We will keep you posted regarding the status of your order through e-mail";
+      $this->msg['class'] = 'woocommerce_message woocommerce_message_info';
+                                               
       $this->order->add_order_note(
         sprintf(
           "Smartcoin Transaction Details: \n
@@ -359,14 +364,15 @@ function smartcoin_add_credit_card_gateway_class( $methods ) {
 }
 
 function add_order_email_instructions($order, $sent_to_admin) {
+  $output = '';
   if(!$sent_to_admin){
     if(get_post_meta( $order->id, 'charge_type', true) == 'bank_slip') {
-      $output = "<p><". _e( 'Your bank slip bar code is:', 'woocommerce' ) . "</p>";
-      $output .= "<strong>" . get_post_meta( $order->id, 'bank_slip_number', true) . "</strong>";
-      $output .= "<p><a href='" . get_post_meta( $order->id, 'bank_slip_link', true) . "' target='_blank' class='button pay'>" .  _e( 'Print Bank Slip', 'smartcoin' ) . "</a></p>";
-      echo $output;
+      $output .= "<p><". _e( 'Your bank slip bar code is:', 'woocommerce' ) . "</p>";
+      $output .= "<p><strong>" . get_post_meta( $order->id, 'bank_slip_number', true) . "</strong></p>";
+      printf( __( '%s', 'woocommerce'), "<p><a href='" . get_post_meta( $order->id, 'bank_slip_link', true) . "' target='_blank' style='font-size: 100%; margin: 0; line-height: 1; cursor: pointer; position: relative; font-family: inherit; text-decoration: none; overflow: visible; padding: .618em 1em; font-weight: 700; border-radius: 3px; left: auto; color: #FFFFFF; background-color: #45B1E8; border: 0; white-space: nowrap; display: inline-block; background-image: none; box-shadow: none; -webkit-box-shadow: none; text-shadow: none;'>Print Bank Slip<a/></p>" );
     }
   }
+  echo $output;
 }
 
 function smartcoin_woocommerce_locate_template( $template, $template_name, $template_path ) {
