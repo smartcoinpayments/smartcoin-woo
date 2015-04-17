@@ -14,12 +14,13 @@ var smartcoin_payment_method_selected = function() {
 
 var smartcoin_restore_button = function() {
   $('input#place_order').removeAttr('disabled');
+  $('input#place_order').removeClass('smartcoin-loading');
   $('input#place_order').css('color', submitButtonOriginalColor);
   $('div#loading').remove();
 }
 
 var smartcoin_disable_button = function(){
-  $('input#place_order').before(loading_html);
+  $('input#place_order').addClass('smartcoin-loading');
   $('input#place_order').attr('disabled','disabled');
   submitButtonOriginalColor = $('input#place_order').css('color');
   $('input#place_order').css('color', $('input#place_order').css('background-color'));
