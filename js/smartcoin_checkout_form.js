@@ -1,8 +1,8 @@
 $ = jQuery;
-var loading_html = "<div id='loading' class='uil-default-css' style='-webkit-transform:scale(0.16)'><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(0deg) translate(0,-60px);transform:rotate(0deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(45deg) translate(0,-60px);transform:rotate(45deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(90deg) translate(0,-60px);transform:rotate(90deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(135deg) translate(0,-60px);transform:rotate(135deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(180deg) translate(0,-60px);transform:rotate(180deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(225deg) translate(0,-60px);transform:rotate(225deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(270deg) translate(0,-60px);transform:rotate(270deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:89px;left:89px;width:22px;height:22px;background:#ffffff;-webkit-transform:rotate(315deg) translate(0,-60px);transform:rotate(315deg) translate(0,-60px);border-radius:10px;position:absolute;'></div></div>";
 var submitButtonOriginalColor;
 var $form = $('form.checkout,form#order_review');
 var installments = 1;
+var card;
 
 var smartcoin_payment_method_selected = function() {
   var result = 'credit_card';
@@ -65,11 +65,7 @@ var smartcoin_charge_credit_card = function(form) {
   }
 
   form.find('.payment-errors').html('');
-  form.block({message: null,overlayCSS: {background: "#fff url(" + woocommerce_params.ajax_loader_url + ") no-repeat center",backgroundSize: "16px 16px",opacity: .6}});
   smartcoin_disable_button();
-
-  if( form.find('[name=smartcoin_token]').length)
-    return true;
 
   if(_user_id == "") {
     _user_id = $('#billing_email').val();
@@ -93,12 +89,22 @@ var smartcoin_charge_bank_slip = function(form){
 }
 
 var smartcoin_setting_credit_card_form = function() {
-  $('form[name="checkout"]').card({
-    container: $('.smartcoin-card-wrapper'),
-    numberInput: 'input[data-smartcoin="number"]',
-    expiryInput: 'select[data-smartcoin="exp_month"],select[data-smartcoin="exp_year"]',
-    cvcInput: 'input[data-smartcoin="cvc"]',
-    nameInput: 'input[data-smartcoin="name"]',
+  $('.smartcoin-card-wrapper').html('');
+  card = new Card({
+    form: 'form[name="checkout"]',
+    container: '.smartcoin-card-wrapper',
+
+    formSelectors: {
+        numberInput: 'input[data-smartcoin="number"]',
+        expiryInput: 'select[data-smartcoin="exp_year"], select[data-smartcoin="exp_month"]',
+        cvcInput: 'input[data-smartcoin="cvc"]',
+        nameInput: 'input[data-smartcoin="name"]'
+    },
+    values: {
+        name: 'Nome Completo'
+    },
+    // if true, will log helpful messages for setting up Card
+    debug: true // optional - default false
   });
 
   var smartcoin_map = {
@@ -118,7 +124,8 @@ var smartcoin_setting_credit_card_form = function() {
     }
   });
 
-  $('body').on('click', '#place_order,form#order_review input:submit', function(){
+  $('body').on('click','input:submit#place_order', function(event){
+    event.preventDefault();
     if($('input[name=payment_method]:checked').val() != 'Smartcoin'){
         return true;
     }
@@ -151,15 +158,11 @@ var initSmartcoinJS = function() {
   });
 
   smartcoin_setting_credit_card_form();
-
-  $('body').on('checkout_error',function(){
-    smartcoin_restore_button();
-    smartcoin_setting_credit_card_form();
-  });
 }
 
 jQuery(document).ready(function($) {
-  setTimeout(function() {
-    initSmartcoinJS();
-  }, 3000);
+  $('body').on('init_add_payment_method', initSmartcoinJS);
+  $('form.checkout').on('checkout_place_order_' + $('#order_review input[name=payment_method]:checked').val() ,initSmartcoinJS);
+  $('body').on('updated_checkout', initSmartcoinJS);
+  $('body').on('checkout_error', smartcoin_restore_button);
 });
