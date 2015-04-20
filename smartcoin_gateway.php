@@ -32,9 +32,12 @@ class Smartcoin extends WC_Payment_Gateway {
     $this->api_secret           = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
     $this->allowInstallments    = strcmp($this->get_option('sc_allow_installments'),'yes') == 0;
     $this->numberOfInstallments = $this->get_option('sc_number_of_installments');
+    $this->webhook_url          = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'Smartcoin', home_url( '/' ) ) );
 
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
+    add_action('woocommerce_api_smartcoin', array($this,'smartcoin_webhook_handler'));
+
     update_option('sc_debug', $this->get_option('sc_debug'));
     update_option('sc_test_api_key', $this->test_api_key);
     update_option('sc_live_api_key', $this->live_api_key);
@@ -51,46 +54,62 @@ class Smartcoin extends WC_Payment_Gateway {
         'enabled' => array(
             'type'        => 'checkbox',
             'title'       => __('Enable/Disable', 'woothemes'),
-            'label'       => __('Enable Smartcoin Credit Card Payment', 'woothemes'),
+            'label'       => __('Enable Smartcoin Credit Card Payment', 'smartcion'),
             'default'     => 'yes'
           ),
         'sc_debug' => array(
             'type'        => 'checkbox',
-            'title'       => __('Test mode (sandbox)', 'woothemes'),
-            'label'       => __('Turn on the test mode', 'woothemes'),
+            'title'       => __('Test mode (sandbox)', 'smartcion'),
+            'label'       => __('Turn on the test mode', 'smartcion'),
             'default'     => 'yes'
           ),
         'sc_test_api_key' => array(
             'type'        => 'text',
-            'title'       => __('Test API Key', 'woothemes'),
-            'default'     => __('','woothemes')
+            'title'       => __('Test API Key', 'smartcion'),
+            'default'     => __('','smartcion')
           ),
         'sc_test_api_secret' => array(
             'type'        => 'password',
-            'title'       => __('Test API Secret', 'woothemes'),
-            'default'     => __('','woothemes')
+            'title'       => __('Test API Secret', 'smartcion'),
+            'default'     => __('','smartcion')
           ),
         'sc_live_api_key' => array(
             'type'        => 'text',
-            'title'       => __('Live API Key', 'woothemes'),
-            'default'     => __('','woothemes')
+            'title'       => __('Live API Key', 'smartcion'),
+            'default'     => __('','smartcion')
           ),
         'sc_live_api_secret' => array(
             'type'        => 'password',
-            'title'       => __('Live API Secret', 'woothemes'),
-            'default'     => __('','woothemes')
+            'title'       => __('Live API Secret', 'smartcion'),
+            'default'     => __('','smartcion')
           ),
         'sc_allow_installments' => array(
             'type'        => 'checkbox',
-            'title'       => __('Allow Installments', 'woothemes'),
-            'default'     => __('yes','woothemes')
+            'title'       => __('Allow Installments', 'smartcion'),
+            'default'     => __('yes','smartcion')
           ),
         'sc_number_of_installments' => array(
             'type'        => 'number',
-            'title'       => __('Number max of installments', 'woothemes'),
-            'default'     => __(6,'woothemes')
+            'title'       => __('Number max of installments', 'smartcion'),
+            'default'     => __(6,'smartcion')
+          ),
+        'sc_webhook_url' => array(
+            'type'        => 'text',
+            'title'       => __('Webhook URL to receive Charge updates', 'smartcion'),
+            'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcion'),
+            'default'     => __($this->get_wc_request_url(),'smartcion')
           )
       );
+  }
+
+  protected function get_wc_request_url() {
+    global $woocommerce;
+
+    if(defined('WC_VERSION') && version_compare(WC_VERSION, '2.1', '>=')) {
+      return WC()->api_request_url(($this->id));
+    } else {
+      return $woocommerce->api_request_url(($this->id));
+    }
   }
 
   public function admin_options() {
@@ -211,6 +230,7 @@ class Smartcoin extends WC_Payment_Gateway {
     $mode = (strcmp($this->get_option('sc_debug'),'yes') == 0 ? 'test' : 'live' );
     $type = ($this->charge->type == 'credit_card' ? 'Cartão de Crédito' : 'Boleto Bancário');
     update_post_meta( $this->order->id, 'charge_type', $this->charge->type);
+    update_post_meta( $this->order->id, 'charge_id', $this->charge->id);
 
     if($this->charge->type == 'credit_card'){
       $this->order->payment_complete($this->transaction_id);
@@ -355,6 +375,36 @@ class Smartcoin extends WC_Payment_Gateway {
       return new WP_Error( 'scwc_refund_error', $e->getMessage());
     }
     return false;
+  }
+
+  function smartcoin_webhook_handler() {
+    global $woocommerce;
+
+    $logger = new WC_Logger();
+    $logger->add( $this->id, 'Teste' );
+
+    $input = @file_get_contents("php://input");
+    $event_json = json_decode($input,true);
+    
+    if($event_json && $event_json['object'] == 'event') {
+      if($event_json['type'] == 'charge.updated') {
+        global $wpdb;
+        $charge_id =  $event_json['data']['id'];
+        $order_id  = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'charge_id' AND meta_value = '%s'", $charge_id ) );
+
+        if($order_id) {
+          if($event_json['data']['type'] == 'bank_slip' && $event_json['data']['paid']) {
+            $order = new WC_Order( $order_id );  
+            $order->add_order_note( __( 'Paid successfully.', 'smartcoin' ) );
+            // Changing the order for processing and reduces the stock.
+            $order->payment_complete();
+          }
+        }
+      }
+    }  
+
+    http_response_code(200);
+    exit();
   }
 }
 
