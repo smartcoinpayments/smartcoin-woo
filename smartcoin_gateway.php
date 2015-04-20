@@ -102,16 +102,6 @@ class Smartcoin extends WC_Payment_Gateway {
       );
   }
 
-  protected function get_wc_request_url() {
-    global $woocommerce;
-
-    if(defined('WC_VERSION') && version_compare(WC_VERSION, '2.1', '>=')) {
-      return WC()->api_request_url(($this->id));
-    } else {
-      return $woocommerce->api_request_url(($this->id));
-    }
-  }
-
   public function admin_options() {
     include_once('templates/admin.php');
   }
