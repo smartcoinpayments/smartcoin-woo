@@ -37,6 +37,8 @@ class Smartcoin extends WC_Payment_Gateway {
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
     add_action('woocommerce_api_smartcoin', array($this,'smartcoin_webhook_handler'));
+    add_action('woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
+    add_action( 'woocommerce_email_before_order_table', array( $this, 'add_order_email_instructions' ), 10, 3 );
 
     update_option('sc_show_radio_button', $this->get_option('sc_show_radio_button'));
     update_option('sc_debug', $this->get_option('sc_debug'));
@@ -129,7 +131,7 @@ class Smartcoin extends WC_Payment_Gateway {
     global $woocommerce;
     return $woocommerce->api_request_url(get_class($this));
   }
-  
+
   public function payment_fields() {
     include_once('templates/payment_form.php');
   }
@@ -417,54 +419,38 @@ class Smartcoin extends WC_Payment_Gateway {
     http_response_code(200);
     exit();
   }
+
+  public function thankyou_page($order_id) {
+    $order        = new WC_Order( $order_id );
+    $charge_type = get_post_meta( $order->id, 'charge_type', true);
+    if( $charge_type == 'bank_slip'){
+      woocommerce_get_template('thankyou.php',
+        array(  'bank_slip_number'  => get_post_meta( $order->id, 'bank_slip_number', true),
+                'bank_slip_link'    => get_post_meta( $order->id, 'bank_slip_link', true),
+                'charge_type'       => $charge_type),
+        'woocommerce/smartcoin-woo/',
+        (plugin_dir_path( __FILE__ ) . 'templates/')
+      );
+    }
+  }
+
+  public function add_order_email_instructions($order, $sent_to_admin, $plain_text = false) {
+    if(!$sent_to_admin){
+      $charge_type = get_post_meta( $order->id, 'charge_type', true);
+      if( $charge_type == 'bank_slip'){
+        woocommerce_get_template('email_thankyou.php',
+          array(  'bank_slip_number'  => get_post_meta( $order->id, 'bank_slip_number', true),
+                  'bank_slip_link'    => get_post_meta( $order->id, 'bank_slip_link', true),
+                  'charge_type'       => $charge_type),
+          'woocommerce/smartcoin-woo/',
+          (plugin_dir_path( __FILE__ ) . 'templates/')
+        );
+      }
+    }
+  }
 }
 
 function smartcoin_add_credit_card_gateway_class( $methods ) {
   $methods[] = 'Smartcoin';
   return $methods;
-}
-
-function add_order_email_instructions($order, $sent_to_admin) {
-  $output = '';
-  if(!$sent_to_admin){
-    if(get_post_meta( $order->id, 'charge_type', true) == 'bank_slip') {
-      $output .= "<p><". _e( 'Your bank slip bar code is:', 'smartcoin-woo' ) . "</p>";
-      $output .= "<p><strong>" . get_post_meta( $order->id, 'bank_slip_number', true) . "</strong></p>";
-      printf('%s',__("<p><a href='" . get_post_meta( $order->id, 'bank_slip_link', true) . "' target='_blank' style='font-size: 100%; margin: 0; line-height: 1; cursor: pointer; position: relative; font-family: inherit; text-decoration: none; overflow: visible; padding: .618em 1em; font-weight: 700; border-radius: 3px; left: auto; color: #FFFFFF; background-color: #45B1E8; border: 0; white-space: nowrap; display: inline-block; background-image: none; box-shadow: none; -webkit-box-shadow: none; text-shadow: none;'>Print Bank Slip<a/></p>", 'smartcoin-woo'));
-    }
-  }
-  echo $output;
-}
-
-function smartcoin_woo_path() {
-  return untrailingslashit(plugin_dir_path(__FILE__));
-}
-
-function smartcoin_woocommerce_locate_template( $template, $template_name, $template_path ) {
-  global $woocommerce;
- 
-  $_template = $template;
-  if(!$template_path) 
-    $template_path = $woocommerce->template_url;
-  
-  $plugin_path  = smartcoin_woo_path() . '/woocommerce/';
- 
-  // Look within passed path within the theme - this is priority
-  $template = locate_template(
-    array(
-      $template_path . $template_name,
-      $template_name
-    )
-  );
- 
-  // Modification: Get the template from this plugin, if it exists
-  if(file_exists($plugin_path . $template_name))
-    $template = $plugin_path . $template_name;
- 
-  // Use default template
-  if (!$template)
-    $template = $_template;
-
-  // Return what we found
-  return $template;
 }
