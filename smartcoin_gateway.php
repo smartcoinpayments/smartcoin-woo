@@ -20,9 +20,10 @@ class Smartcoin extends WC_Payment_Gateway {
         'refunds'
       );
 
-    $this->title                = 'Smartcoin';
+    $this->title                = $this->get_option( 'title' );;
     $this->description          = '';
     $this->icon                 = '';
+    $this->show_radio_button    = strcmp($this->get_option('sc_show_radio_button'),'yes') == 0;
     $this->use_test_api         = strcmp($this->get_option('sc_debug'),'yes') == 0;
     $this->test_api_key         = $this->get_option('sc_test_api_key');
     $this->test_api_secret      = $this->get_option('sc_test_api_secret');
@@ -36,7 +37,10 @@ class Smartcoin extends WC_Payment_Gateway {
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
     add_action('woocommerce_api_smartcoin', array($this,'smartcoin_webhook_handler'));
+    add_action('woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
+    add_action( 'woocommerce_email_before_order_table', array( $this, 'add_order_email_instructions' ), 10, 3 );
 
+    update_option('sc_show_radio_button', $this->get_option('sc_show_radio_button'));
     update_option('sc_debug', $this->get_option('sc_debug'));
     update_option('sc_test_api_key', $this->test_api_key);
     update_option('sc_live_api_key', $this->live_api_key);
@@ -52,50 +56,63 @@ class Smartcoin extends WC_Payment_Gateway {
     $this->form_fields = array(
         'enabled' => array(
             'type'        => 'checkbox',
-            'title'       => __('Enable/Disable', 'woothemes'),
-            'label'       => __('Enable Smartcoin Credit Card Payment', 'smartcion'),
+            'title'       => __('Enable/Disable', 'smartcoin-woo'),
+            'label'       => __('Enable Smartcoin Credit Card Payment', 'smartcoin-woo'),
             'default'     => 'yes'
           ),
         'sc_debug' => array(
             'type'        => 'checkbox',
-            'title'       => __('Test mode (sandbox)', 'smartcion'),
-            'label'       => __('Turn on the test mode', 'smartcion'),
+            'title'       => __('Test mode (sandbox)', 'smartcoin-woo'),
+            'label'       => __('Turn on the test mode', 'smartcoin-woo'),
             'default'     => 'yes'
+          ),
+        'sc_show_radio_button' => array(
+            'type'        => 'checkbox',
+            'title'       => __('Show Radio Button', 'smartcoin-woo'),
+            'label'       => __('If you are using just Smartcoin as payment method, disable this option', 'smartcoin-woo'),
+            'default'     => 'yes'
+          ),
+        'title' => array(
+          'title' => __( 'Title', 'smartcoin-woo' ),
+          'type' => 'text',
+          'description' => __( 'This controls the title which the user sees during checkout.', 'smartcoin-woo' ),
+          'default' => __( 'Credit Card and Bank Slip', 'smartcoin-woo' ),
+          'desc_tip'      => true
           ),
         'sc_test_api_key' => array(
             'type'        => 'text',
-            'title'       => __('Test API Key', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Test API Key', 'smartcoin-woo'),
+            'default'     => __('','smartcoin-woo')
           ),
         'sc_test_api_secret' => array(
             'type'        => 'password',
-            'title'       => __('Test API Secret', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Test API Secret', 'smartcoin-woo'),
+            'default'     => __('','smartcoin-woo')
           ),
         'sc_live_api_key' => array(
             'type'        => 'text',
-            'title'       => __('Live API Key', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Live API Key', 'smartcoin-woo'),
+            'default'     => __('','smartcoin-woo')
           ),
         'sc_live_api_secret' => array(
             'type'        => 'password',
-            'title'       => __('Live API Secret', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Live API Secret', 'smartcoin-woo'),
+            'default'     => __('','smartcoin-woo')
           ),
         'sc_allow_installments' => array(
             'type'        => 'checkbox',
-            'title'       => __('Allow Installments', 'smartcion'),
-            'default'     => __('yes','smartcion')
+            'title'       => __('Allow Installments', 'smartcoin-woo'),
+            'default'     => __('yes','smartcoin-woo')
           ),
         'sc_number_of_installments' => array(
             'type'        => 'number',
-            'title'       => __('Number max of installments', 'smartcion'),
-            'default'     => __(6,'smartcion')
+            'title'       => __('Number max of installments', 'smartcoin-woo'),
+            'default'     => __(6,'smartcoin-woo')
           ),
         'sc_webhook_url' => array(
             'type'        => 'text',
-            'title'       => __('Webhook URL to receive Charge updates', 'smartcion'),
-            'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcion'),
+            'title'       => __('Webhook URL to receive Charge updates', 'smartcoin-woo'),
+            'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcoin-woo'),
             'default'     => ($this->get_wc_request_url() . '&rand=' . $this->generateRandomString(20))
           )
       );
@@ -113,10 +130,6 @@ class Smartcoin extends WC_Payment_Gateway {
   protected function get_wc_request_url() {
     global $woocommerce;
     return $woocommerce->api_request_url(get_class($this));
-  }
-
-  public function admin_options() {
-    include_once('templates/admin.php');
   }
 
   public function payment_fields() {
@@ -166,7 +179,7 @@ class Smartcoin extends WC_Payment_Gateway {
         }else {
           $error_message = ' Desculpe, mas não conseguimos processar o seu cartão. Por favor, tente novamente com outro cartão de crédito.';
           $this->transaction_error_message = $error_message;
-          wc_add_notice( __('Payment error:', 'woothemes') . $error_message, 'error' );
+          wc_add_notice( __('Payment error:', 'smartcoin-woo') . $error_message, 'error' );
           return;
         }
       }else {
@@ -188,7 +201,7 @@ class Smartcoin extends WC_Payment_Gateway {
       $err  = $body['error'];
       error_log('Smartcoin Error:' . $err['message'] . "\n");
       $this->transaction_error_message = 'Smartcoin Error:' . $err['message'] . "\n";
-      wc_add_notice( __('Payment error:', 'woothemes') . $err['message'], 'error' );
+      wc_add_notice( __('Payment error:', 'smartcoin-woo') . $err['message'], 'error' );
       return;
     }
   }
@@ -269,7 +282,7 @@ class Smartcoin extends WC_Payment_Gateway {
       update_post_meta( $this->order->id, 'bank_slip_number', $this->charge->bank_slip->bar_code);
       update_post_meta( $this->order->id, 'bank_slip_link', $this->charge->bank_slip->link);
 
-      $this->order->update_status('on-hold', __('Pending payment', 'smartcoin'));
+      $this->order->update_status('on-hold', __('Pending payment', 'smartcoin-woo'));
       $this->msg['message'] = "Thank you for shopping with us. Right now your payment staus is pending, We will keep you posted regarding the status of your order through e-mail";
       $this->msg['class'] = 'woocommerce_message woocommerce_message_info';
                                                
@@ -382,7 +395,7 @@ class Smartcoin extends WC_Payment_Gateway {
 
   public function smartcoin_webhook_handler() {
     global $woocommerce;
-    
+
     $input = @file_get_contents("php://input");
     $event_json = json_decode($input,true);
     
@@ -395,7 +408,7 @@ class Smartcoin extends WC_Payment_Gateway {
         if($order_id) {
           if($event_json['data']['type'] == 'bank_slip' && !$event_json['data']['paid']) {
             $order = new WC_Order( $order_id );  
-            $order->add_order_note( __( 'Paid successfully.', 'smartcoin' ) );
+            $order->add_order_note( __( 'Paid successfully.', 'smartcoin-woo' ) );
             // Changing the order for processing and reduces the stock.
             $order->payment_complete();
           }
@@ -406,54 +419,38 @@ class Smartcoin extends WC_Payment_Gateway {
     http_response_code(200);
     exit();
   }
+
+  public function thankyou_page($order_id) {
+    $order        = new WC_Order( $order_id );
+    $charge_type = get_post_meta( $order->id, 'charge_type', true);
+    if( $charge_type == 'bank_slip'){
+      woocommerce_get_template('thankyou.php',
+        array(  'bank_slip_number'  => get_post_meta( $order->id, 'bank_slip_number', true),
+                'bank_slip_link'    => get_post_meta( $order->id, 'bank_slip_link', true),
+                'charge_type'       => $charge_type),
+        'woocommerce/smartcoin-woo/',
+        (plugin_dir_path( __FILE__ ) . 'templates/')
+      );
+    }
+  }
+
+  public function add_order_email_instructions($order, $sent_to_admin, $plain_text = false) {
+    if(!$sent_to_admin){
+      $charge_type = get_post_meta( $order->id, 'charge_type', true);
+      if( $charge_type == 'bank_slip'){
+        woocommerce_get_template('email_thankyou.php',
+          array(  'bank_slip_number'  => get_post_meta( $order->id, 'bank_slip_number', true),
+                  'bank_slip_link'    => get_post_meta( $order->id, 'bank_slip_link', true),
+                  'charge_type'       => $charge_type),
+          'woocommerce/smartcoin-woo/',
+          (plugin_dir_path( __FILE__ ) . 'templates/')
+        );
+      }
+    }
+  }
 }
 
 function smartcoin_add_credit_card_gateway_class( $methods ) {
   $methods[] = 'Smartcoin';
   return $methods;
-}
-
-function add_order_email_instructions($order, $sent_to_admin) {
-  $output = '';
-  if(!$sent_to_admin){
-    if(get_post_meta( $order->id, 'charge_type', true) == 'bank_slip') {
-      $output .= "<p><". _e( 'Your bank slip bar code is:', 'woocommerce' ) . "</p>";
-      $output .= "<p><strong>" . get_post_meta( $order->id, 'bank_slip_number', true) . "</strong></p>";
-      printf( __( '%s', 'woocommerce'), "<p><a href='" . get_post_meta( $order->id, 'bank_slip_link', true) . "' target='_blank' style='font-size: 100%; margin: 0; line-height: 1; cursor: pointer; position: relative; font-family: inherit; text-decoration: none; overflow: visible; padding: .618em 1em; font-weight: 700; border-radius: 3px; left: auto; color: #FFFFFF; background-color: #45B1E8; border: 0; white-space: nowrap; display: inline-block; background-image: none; box-shadow: none; -webkit-box-shadow: none; text-shadow: none;'>Print Bank Slip<a/></p>" );
-    }
-  }
-  echo $output;
-}
-
-function smartcoin_woo_path() {
-  return untrailingslashit(plugin_dir_path(__FILE__));
-}
-
-function smartcoin_woocommerce_locate_template( $template, $template_name, $template_path ) {
-  global $woocommerce;
- 
-  $_template = $template;
-  if(!$template_path) 
-    $template_path = $woocommerce->template_url;
-  
-  $plugin_path  = smartcoin_woo_path() . '/woocommerce/';
- 
-  // Look within passed path within the theme - this is priority
-  $template = locate_template(
-    array(
-      $template_path . $template_name,
-      $template_name
-    )
-  );
- 
-  // Modification: Get the template from this plugin, if it exists
-  if(file_exists($plugin_path . $template_name))
-    $template = $plugin_path . $template_name;
- 
-  // Use default template
-  if (!$template)
-    $template = $_template;
-
-  // Return what we found
-  return $template;
 }

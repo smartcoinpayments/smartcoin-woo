@@ -8,13 +8,16 @@
 <input type="radio" id="smartcoin_payment_method_bank_slip" name="smartcoin_payment_method" value="bank_slip" >
 <label for="smartcoin_payment_method_bank_slip">Boleto Bancário</label></br>
 <section id="smartcoin_bank_slip_section"  style="display: none;">
+  <p class="form-row">
+    Clique no botão abaixo para gerar o boleto.
+  </p>
 </section>
 
 <!-- Credit Card Form -->
 <input type="radio" id="smartcoin_payment_method_credit_card" name="smartcoin_payment_method" value="credit_card" checked> 
 <label for="smartcoin_payment_method_credit_card">Cartão de Crédito</label></br>
 <section id="smartcoin_credit_card_section">
-  <div class="smartcoin-card-wrapper" ></div>
+  <div class="form-row form-row-first smartcoin-card-wrapper" ></div>
   <div class="clear"></div>
   <span class="payment-errors required"></span>
   <p class="form-row">
@@ -56,7 +59,7 @@
       ?>
     </select>
   </p>
-  <p class="form-row form-row-last" style="width:150px;">
+  <p class="form-row form-row-first" style="width:150px;">
   <label>Código de Segurança <span class="required">*</span></label>
   <input class="input-text" type="text" data-smartcoin="cvc" style="width:65px;"/>
     <?php if($this->allowInstallments){ ?>

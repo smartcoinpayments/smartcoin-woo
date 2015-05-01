@@ -1,0 +1,194 @@
+# Loco Gettext template
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Smartcoin (payment Gateway)\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: Fri May 01 2015 01:52:25 GMT-0300 (BRT)\n"
+"POT-Revision-Date: Fri May 01 2015 14:47:44 GMT-0300 (BRT)\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+"X-Poedit-KeywordsList: _:1;gettext:1;dgettext:2;ngettext:1,2;dngettext:2,3;"
+"__:1;_e:1;_c:1;_n:1,2;_n_noop:1,2;_nc:1,2;__ngettext:1,2;__ngettext_noop:1,2;"
+"_x:1,2c;_ex:1,2c;_nx:1,2,4c;_nx_noop:1,2,3c;_n_js:1,2;_nx_js:1,2,3c;"
+"esc_attr__:1;esc_html__:1;esc_attr_e:1;esc_html_e:1;esc_attr_x:1,2c;"
+"esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
+"X-Generator: Loco - https://localise.biz/"
+
+#: ../smartcoin_gateway.php:49
+msgid ""
+"<div class=\"error\"><p>Smartcoin test API is disable and force SSL option is "
+"disable. Please enable SSL and ensure your server has valid SSL certificate."
+"</p></div>"
+msgstr ""
+
+#: ../smartcoin_gateway.php:57
+msgid "Enable/Disable"
+msgstr ""
+
+#: ../smartcoin_gateway.php:58
+msgid "Enable Smartcoin Credit Card Payment"
+msgstr ""
+
+#: ../smartcoin_gateway.php:63
+msgid "Test mode (sandbox)"
+msgstr ""
+
+#: ../smartcoin_gateway.php:64
+msgid "Turn on the test mode"
+msgstr ""
+
+#: ../smartcoin_gateway.php:69
+msgid "Show Radio Button"
+msgstr ""
+
+#: ../smartcoin_gateway.php:70
+msgid "If you are using just Smartcoin as payment method, disable this option"
+msgstr ""
+
+#: ../smartcoin_gateway.php:74
+msgid "Title"
+msgstr ""
+
+#: ../smartcoin_gateway.php:76
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#: ../smartcoin_gateway.php:77
+msgid "Credit Card and Bank Slip"
+msgstr ""
+
+#: ../smartcoin_gateway.php:82
+msgid "Test API Key"
+msgstr ""
+
+#: ../smartcoin_gateway.php:87
+msgid "Test API Secret"
+msgstr ""
+
+#: ../smartcoin_gateway.php:92
+msgid "Live API Key"
+msgstr ""
+
+#: ../smartcoin_gateway.php:97
+msgid "Live API Secret"
+msgstr ""
+
+#: ../smartcoin_gateway.php:102
+msgid "Allow Installments"
+msgstr ""
+
+#: ../smartcoin_gateway.php:103
+msgid "yes"
+msgstr ""
+
+#: ../smartcoin_gateway.php:107
+msgid "Number max of installments"
+msgstr ""
+
+#: ../smartcoin_gateway.php:112
+msgid "Webhook URL to receive Charge updates"
+msgstr ""
+
+#: ../smartcoin_gateway.php:113
+msgid "Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks"
+msgstr ""
+
+#: ../smartcoin_gateway.php:184 ../smartcoin_gateway.php:206
+msgid "Payment error:"
+msgstr ""
+
+#: ../smartcoin_gateway.php:287
+msgid "Pending payment"
+msgstr ""
+
+#: ../smartcoin_gateway.php:345
+#, php-format
+msgid "%s Credit Card Refund failed because the Transaction ID is missing."
+msgstr ""
+
+#: ../smartcoin_gateway.php:374 ../smartcoin_gateway.php:386
+#, php-format
+msgid "%s Credit Card Refund Failed with message: \"%s\""
+msgstr ""
+
+#: ../smartcoin_gateway.php:413
+msgid "Paid successfully."
+msgstr ""
+
+#: ../smartcoin_gateway.php:435 ../woocommerce/checkout/thankyou.php:37
+msgid "Your bank slip bar code is:"
+msgstr ""
+
+#: ../templates/admin.php:6
+msgid "Smartcoin - Credit Card Payment"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:17
+msgid ""
+"Unfortunately your order cannot be processed as the originating "
+"bank/merchant has declined your transaction."
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:21
+msgid "Please attempt your purchase again or go to your account page."
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:23
+msgid "Please attempt your purchase again."
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:27
+msgid "Pay"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:29
+msgid "My Account"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:36
+msgid ""
+"Thank you. Your order has been received. But we are awaiting the payment "
+"confirmation."
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:39
+msgid "Print Bank Slip"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:41 ../woocommerce/checkout/thankyou.php:72
+msgid "Thank you. Your order has been received."
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:46
+msgid "Order Number:"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:50
+msgid "Date:"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:54
+msgid "Total:"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:59
+msgid "Payment Method:"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:60
+msgid "Bank Slip"
+msgstr ""
+
+#: ../woocommerce/checkout/thankyou.php:60
+msgid "Credit Card"
+msgstr ""
