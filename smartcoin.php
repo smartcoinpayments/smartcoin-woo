@@ -12,6 +12,7 @@
 function smartcoin_init_your_gateway() {
   if(class_exists('WC_Payment_Gateway')) {
     include_once('smartcoin_gateway.php');
+    smartcoin_load_plugin_textdomain();
   }
 }
 
@@ -43,6 +44,10 @@ function enqueue_script_and_styles() {
 	wp_enqueue_style( 'smartcoin_css',  plugins_url( 'css/smartcoin.css', __FILE__ ));
 	wp_enqueue_style( 'smartcoin_loading_css',  plugins_url( 'css/loading.css', __FILE__ ));
 	
+}
+
+function smartcoin_load_plugin_textdomain() {
+  load_plugin_textdomain('smartcoin-woo', false, dirname(plugin_basename( __FILE__ )) . '/languages/');
 }
 
 function wpcontent_svg_mime_type( $mimes = array() ) {
