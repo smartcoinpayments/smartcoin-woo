@@ -32,8 +32,7 @@ class Smartcoin extends WC_Payment_Gateway {
     $this->api_secret           = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
     $this->allowInstallments    = strcmp($this->get_option('sc_allow_installments'),'yes') == 0;
     $this->numberOfInstallments = $this->get_option('sc_number_of_installments');
-    $this->webhook_url          = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'Smartcoin', home_url( '/' ) ) );
-
+    
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
     add_action('woocommerce_api_smartcoin', array($this,'smartcoin_webhook_handler'));
@@ -97,9 +96,23 @@ class Smartcoin extends WC_Payment_Gateway {
             'type'        => 'text',
             'title'       => __('Webhook URL to receive Charge updates', 'smartcion'),
             'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcion'),
-            'default'     => __($this->get_wc_request_url(),'smartcion')
+            'default'     => ($this->get_wc_request_url() . '&rand=' . $this->generateRandomString(20))
           )
       );
+  }
+
+  protected function generateRandomString($length = 10) {
+      $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $charactersLength = strlen($characters);
+      $randomString = '';
+      for ($i = 0; $i < $length; $i++) {
+          $randomString .= $characters[rand(0, $charactersLength - 1)];
+      }
+      return $randomString;
+  }
+  protected function get_wc_request_url() {
+    global $woocommerce;
+    return $woocommerce->api_request_url(get_class($this));
   }
 
   public function admin_options() {
@@ -367,12 +380,9 @@ class Smartcoin extends WC_Payment_Gateway {
     return false;
   }
 
-  function smartcoin_webhook_handler() {
+  public function smartcoin_webhook_handler() {
     global $woocommerce;
-
-    $logger = new WC_Logger();
-    $logger->add( $this->id, 'Teste' );
-
+    
     $input = @file_get_contents("php://input");
     $event_json = json_decode($input,true);
     
@@ -383,7 +393,7 @@ class Smartcoin extends WC_Payment_Gateway {
         $order_id  = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'charge_id' AND meta_value = '%s'", $charge_id ) );
 
         if($order_id) {
-          if($event_json['data']['type'] == 'bank_slip' && $event_json['data']['paid']) {
+          if($event_json['data']['type'] == 'bank_slip' && !$event_json['data']['paid']) {
             $order = new WC_Order( $order_id );  
             $order->add_order_note( __( 'Paid successfully.', 'smartcoin' ) );
             // Changing the order for processing and reduces the stock.

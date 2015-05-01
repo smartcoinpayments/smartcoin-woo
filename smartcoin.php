@@ -22,7 +22,9 @@ add_action('woocommerce_email_before_order_table', 'add_order_email_instructions
 add_action( 'woocommerce_api_callback', 'callback_handler' );
 
 function callback_handler() {
-	return "";
+	$logger = new WC_Logger();
+   $logger->add( $this->id, 'Teste2' );
+	return "teste";
 }
 
 add_filter('woocommerce_locate_template', 'smartcoin_woocommerce_locate_template', 10, 3 );
