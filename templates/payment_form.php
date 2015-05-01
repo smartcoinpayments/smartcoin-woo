@@ -8,6 +8,9 @@
 <input type="radio" id="smartcoin_payment_method_bank_slip" name="smartcoin_payment_method" value="bank_slip" >
 <label for="smartcoin_payment_method_bank_slip">Boleto Bancário</label></br>
 <section id="smartcoin_bank_slip_section"  style="display: none;">
+  <p class="form-row">
+    Clique no botão abaixo para gerar o boleto.
+  </p>
 </section>
 
 <!-- Credit Card Form -->
