@@ -20,9 +20,10 @@ class Smartcoin extends WC_Payment_Gateway {
         'refunds'
       );
 
-    $this->title                = 'Smartcoin';
+    $this->title                = $this->get_option( 'title' );;
     $this->description          = '';
     $this->icon                 = '';
+    $this->show_radio_button    = strcmp($this->get_option('sc_show_radio_button'),'yes') == 0;
     $this->use_test_api         = strcmp($this->get_option('sc_debug'),'yes') == 0;
     $this->test_api_key         = $this->get_option('sc_test_api_key');
     $this->test_api_secret      = $this->get_option('sc_test_api_secret');
@@ -37,6 +38,7 @@ class Smartcoin extends WC_Payment_Gateway {
     add_action('admin_notices', array(&$this, 'check_ssl'));
     add_action('woocommerce_api_smartcoin', array($this,'smartcoin_webhook_handler'));
 
+    update_option('sc_show_radio_button', $this->get_option('sc_show_radio_button'));
     update_option('sc_debug', $this->get_option('sc_debug'));
     update_option('sc_test_api_key', $this->test_api_key);
     update_option('sc_live_api_key', $this->live_api_key);
@@ -53,49 +55,62 @@ class Smartcoin extends WC_Payment_Gateway {
         'enabled' => array(
             'type'        => 'checkbox',
             'title'       => __('Enable/Disable', 'woothemes'),
-            'label'       => __('Enable Smartcoin Credit Card Payment', 'smartcion'),
+            'label'       => __('Enable Smartcoin Credit Card Payment', 'smartcoin'),
             'default'     => 'yes'
           ),
         'sc_debug' => array(
             'type'        => 'checkbox',
-            'title'       => __('Test mode (sandbox)', 'smartcion'),
-            'label'       => __('Turn on the test mode', 'smartcion'),
+            'title'       => __('Test mode (sandbox)', 'smartcoin'),
+            'label'       => __('Turn on the test mode', 'smartcoin'),
             'default'     => 'yes'
+          ),
+        'sc_show_radio_button' => array(
+            'type'        => 'checkbox',
+            'title'       => __('Show Radio Button', 'smartcoin'),
+            'label'       => __('If you are using just Smartcoin as payment method, disable this option', 'smartcoin'),
+            'default'     => 'yes'
+          ),
+        'title' => array(
+          'title' => __( 'Title', 'smartcoin' ),
+          'type' => 'text',
+          'description' => __( 'This controls the title which the user sees during checkout.', 'smartcoin' ),
+          'default' => __( 'Credit Card and Bank Slip', 'smartcoin' ),
+          'desc_tip'      => true
           ),
         'sc_test_api_key' => array(
             'type'        => 'text',
-            'title'       => __('Test API Key', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Test API Key', 'smartcoin'),
+            'default'     => __('','smartcoin')
           ),
         'sc_test_api_secret' => array(
             'type'        => 'password',
-            'title'       => __('Test API Secret', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Test API Secret', 'smartcoin'),
+            'default'     => __('','smartcoin')
           ),
         'sc_live_api_key' => array(
             'type'        => 'text',
-            'title'       => __('Live API Key', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Live API Key', 'smartcoin'),
+            'default'     => __('','smartcoin')
           ),
         'sc_live_api_secret' => array(
             'type'        => 'password',
-            'title'       => __('Live API Secret', 'smartcion'),
-            'default'     => __('','smartcion')
+            'title'       => __('Live API Secret', 'smartcoin'),
+            'default'     => __('','smartcoin')
           ),
         'sc_allow_installments' => array(
             'type'        => 'checkbox',
-            'title'       => __('Allow Installments', 'smartcion'),
-            'default'     => __('yes','smartcion')
+            'title'       => __('Allow Installments', 'smartcoin'),
+            'default'     => __('yes','smartcoin')
           ),
         'sc_number_of_installments' => array(
             'type'        => 'number',
-            'title'       => __('Number max of installments', 'smartcion'),
-            'default'     => __(6,'smartcion')
+            'title'       => __('Number max of installments', 'smartcoin'),
+            'default'     => __(6,'smartcoin')
           ),
         'sc_webhook_url' => array(
             'type'        => 'text',
-            'title'       => __('Webhook URL to receive Charge updates', 'smartcion'),
-            'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcion'),
+            'title'       => __('Webhook URL to receive Charge updates', 'smartcoin'),
+            'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcoin'),
             'default'     => ($this->get_wc_request_url() . '&rand=' . $this->generateRandomString(20))
           )
       );
@@ -382,7 +397,7 @@ class Smartcoin extends WC_Payment_Gateway {
 
   public function smartcoin_webhook_handler() {
     global $woocommerce;
-    
+
     $input = @file_get_contents("php://input");
     $event_json = json_decode($input,true);
     
