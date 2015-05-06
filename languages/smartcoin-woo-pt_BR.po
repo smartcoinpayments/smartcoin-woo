@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Smartcoin (payment Gateway)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: Fri May 01 2015 01:52:25 GMT-0300 (BRT)\n"
-"PO-Revision-Date: Fri May 01 2015 14:48:27 GMT-0300 (BRT)\n"
+"PO-Revision-Date: Wed May 06 2015 20:19:47 GMT-0300 (BRT)\n"
 "Last-Translator: agranado <agranado@smartcoin.com.br>\n"
 "Language-Team: \n"
 "Language: Portuguese (Brazil)\n"
@@ -22,7 +22,7 @@ msgstr ""
 "X-Generator: Loco - https://localise.biz/\n"
 "X-Loco-Target-Locale: pt_BR"
 
-#: ../smartcoin_gateway.php:49
+#: ../smartcoin_gateway.php:53
 msgid ""
 "<div class=\"error\"><p>Smartcoin test API is disable and force SSL option is "
 "disable. Please enable SSL and ensure your server has valid SSL certificate."
@@ -32,137 +32,109 @@ msgstr ""
 "estão desabilitadas. Por favor, habilite o SSL e certifique-se que o "
 "servidor tenha um certificado SSL válido.</p></div>"
 
-#: ../smartcoin_gateway.php:57
+#: ../smartcoin_gateway.php:61 ../smartcoin_gateway.php:122
 msgid "Enable/Disable"
 msgstr "Habilitar/Desabilitar"
 
-#: ../smartcoin_gateway.php:58
+#: ../smartcoin_gateway.php:62
 msgid "Enable Smartcoin Credit Card Payment"
 msgstr "Habilitar opção de pagamento com cartão de crédito"
 
-#: ../smartcoin_gateway.php:63
+#: ../smartcoin_gateway.php:67
 msgid "Test mode (sandbox)"
 msgstr "Modo 'test' (sandbox)"
 
-#: ../smartcoin_gateway.php:64
+#: ../smartcoin_gateway.php:68
 msgid "Turn on the test mode"
 msgstr "Ligar o modo 'test'"
 
-#: ../smartcoin_gateway.php:69
+#: ../smartcoin_gateway.php:73
 msgid "Show Radio Button"
 msgstr "Exibir botão para escolha do método de pagamento"
 
-#: ../smartcoin_gateway.php:70
+#: ../smartcoin_gateway.php:74
 msgid "If you are using just Smartcoin as payment method, disable this option"
 msgstr ""
 "Se estiver usando apenas a Smartcoin como método de pagamento, desabilite "
 "essa opção"
 
-#: ../smartcoin_gateway.php:74
+#: ../smartcoin_gateway.php:78
 msgid "Title"
 msgstr "Título"
 
-#: ../smartcoin_gateway.php:76
+#: ../smartcoin_gateway.php:80
 msgid "This controls the title which the user sees during checkout."
 msgstr "O título exibido para o usuário na opção de escolha do método de pagamento."
 
-#: ../smartcoin_gateway.php:77
+#: ../smartcoin_gateway.php:81
 msgid "Credit Card and Bank Slip"
 msgstr "Cartão de Crédito e Boleto Bancário"
 
-#: ../smartcoin_gateway.php:82
+#: ../smartcoin_gateway.php:86
 msgid "Test API Key"
 msgstr "Test API Key"
 
-#: ../smartcoin_gateway.php:87
+#: ../smartcoin_gateway.php:91
 msgid "Test API Secret"
 msgstr "Test API Secret"
 
-#: ../smartcoin_gateway.php:92
+#: ../smartcoin_gateway.php:96
 msgid "Live API Key"
 msgstr "Live API key"
 
-#: ../smartcoin_gateway.php:97
+#: ../smartcoin_gateway.php:101
 msgid "Live API Secret"
 msgstr "Live API Secret"
 
-#: ../smartcoin_gateway.php:102
+#: ../smartcoin_gateway.php:106
 msgid "Allow Installments"
 msgstr "Permitir parcelamento"
 
-#: ../smartcoin_gateway.php:103
+#: ../smartcoin_gateway.php:107
 msgid "yes"
 msgstr "sim"
 
-#: ../smartcoin_gateway.php:107
+#: ../smartcoin_gateway.php:111
 msgid "Number max of installments"
 msgstr "Número máximo de parcelas permitidas"
 
-#: ../smartcoin_gateway.php:112
+#: ../smartcoin_gateway.php:116
 msgid "Webhook URL to receive Charge updates"
 msgstr "URL de webhook para receber atualições das cobranças"
 
-#: ../smartcoin_gateway.php:113
+#: ../smartcoin_gateway.php:117
 msgid "Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks"
 msgstr "Inclua essa URL no Smart Manage -> Menu -> Settings -> Webhooks"
 
-#: ../smartcoin_gateway.php:184 ../smartcoin_gateway.php:206
+#: ../smartcoin_gateway.php:123
+msgid "Enable debug mode that will create log in WooCommerce -> System Status -> Log"
+msgstr ""
+"Habilitar o mode 'debug'. O log será criado em WooCommerce -> Status do "
+"Sistema -> Log"
+
+#: ../smartcoin_gateway.php:199 ../smartcoin_gateway.php:221
 msgid "Payment error:"
 msgstr "Erro no Pagamento:"
 
-#: ../smartcoin_gateway.php:287
+#: ../smartcoin_gateway.php:302
 msgid "Pending payment"
 msgstr "Pagamento pendente"
 
-#: ../smartcoin_gateway.php:345
+#: ../smartcoin_gateway.php:360
 #, php-format
 msgid "%s Credit Card Refund failed because the Transaction ID is missing."
 msgstr "%s O reembolso do cartão de crédito falhou porque faltou o ID da transação"
 
-#: ../smartcoin_gateway.php:374 ../smartcoin_gateway.php:386
+#: ../smartcoin_gateway.php:389 ../smartcoin_gateway.php:401
 #, php-format
 msgid "%s Credit Card Refund Failed with message: \"%s\""
 msgstr "%s O reembolso do cartão de crédito falhou com a seguinte mensagem: \"%s\""
 
-#: ../smartcoin_gateway.php:413
+#: ../smartcoin_gateway.php:428
 msgid "Paid successfully."
 msgstr "Pago com sucesso."
 
-#: ../smartcoin_gateway.php:435 ../woocommerce/checkout/thankyou.php:37
-msgid "Your bank slip bar code is:"
-msgstr "O código de barras o boleto é:"
-
-#: ../templates/admin.php:6
-msgid "Smartcoin - Credit Card Payment"
-msgstr "Smartcoin - Pagamento com Cartão de Crédito"
-
-#: ../woocommerce/checkout/thankyou.php:17
-msgid ""
-"Unfortunately your order cannot be processed as the originating "
-"bank/merchant has declined your transaction."
-msgstr ""
-"Infelizmente o seu pedido não pode ser processado porque o bank/emissor "
-"negou a transação."
-
-#: ../woocommerce/checkout/thankyou.php:21
-msgid "Please attempt your purchase again or go to your account page."
-msgstr ""
-"Por favor, tente realizar a compra novamente ou vá para a página do seu "
-"perfil."
-
-#: ../woocommerce/checkout/thankyou.php:23
-msgid "Please attempt your purchase again."
-msgstr "Por favor, tente realizar sua compra novamente."
-
-#: ../woocommerce/checkout/thankyou.php:27
-msgid "Pay"
-msgstr "Pagar"
-
-#: ../woocommerce/checkout/thankyou.php:29
-msgid "My Account"
-msgstr "Meu Perfil"
-
-#: ../woocommerce/checkout/thankyou.php:36
+#: ../templates/email_thankyou.php:4 ../templates/thankyou.php:4
 msgid ""
 "Thank you. Your order has been received. But we are awaiting the payment "
 "confirmation."
@@ -170,34 +142,14 @@ msgstr ""
 "Obrigado. O seu pedido foi recebido com sucesso. Estamos aguardando a "
 "confirmação do seu pagamento."
 
-#: ../woocommerce/checkout/thankyou.php:39
-msgid "Print Bank Slip"
-msgstr "Imprimir Boleto Bancário"
-
-#: ../woocommerce/checkout/thankyou.php:41 ../woocommerce/checkout/thankyou.php:72
+#: ../templates/email_thankyou.php:6 ../templates/thankyou.php:16
 msgid "Thank you. Your order has been received."
 msgstr "Obrigado. O seu pedido foi recebido com sucesso."
 
-#: ../woocommerce/checkout/thankyou.php:46
-msgid "Order Number:"
-msgstr "Número do Pedido:"
+#: ../templates/email_thankyou.php:11 ../templates/thankyou.php:7
+msgid "Your bank slip bar code is:"
+msgstr "O código de barras o boleto é:"
 
-#: ../woocommerce/checkout/thankyou.php:50
-msgid "Date:"
-msgstr "Data:"
-
-#: ../woocommerce/checkout/thankyou.php:54
-msgid "Total:"
-msgstr "Total:"
-
-#: ../woocommerce/checkout/thankyou.php:59
-msgid "Payment Method:"
-msgstr "Método de Pagamento:"
-
-#: ../woocommerce/checkout/thankyou.php:60
-msgid "Bank Slip"
-msgstr "Boleto Bancário"
-
-#: ../woocommerce/checkout/thankyou.php:60
-msgid "Credit Card"
-msgstr "Cartão de Crédito"
+#: ../templates/email_thankyou.php:15 ../templates/thankyou.php:11
+msgid "Print Bank Slip"
+msgstr "Imprimir Boleto Bancário"

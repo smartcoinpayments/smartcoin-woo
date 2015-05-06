@@ -33,6 +33,7 @@ class Smartcoin extends WC_Payment_Gateway {
     $this->api_secret           = $this->use_test_api ? $this->test_api_secret : $this->live_api_secret;
     $this->allowInstallments    = strcmp($this->get_option('sc_allow_installments'),'yes') == 0;
     $this->numberOfInstallments = $this->get_option('sc_number_of_installments');
+    $this->sc_track_debug       = strcmp($this->get_option('sc_track_debug'),'yes') == 0;
     
     add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
     add_action('admin_notices', array(&$this, 'check_ssl'));
@@ -44,6 +45,7 @@ class Smartcoin extends WC_Payment_Gateway {
     update_option('sc_debug', $this->get_option('sc_debug'));
     update_option('sc_test_api_key', $this->test_api_key);
     update_option('sc_live_api_key', $this->live_api_key);
+    update_option('sc_track_debug', $this->get_option('sc_track_debug'));
   }
 
   public function check_ssl() {
@@ -114,6 +116,12 @@ class Smartcoin extends WC_Payment_Gateway {
             'title'       => __('Webhook URL to receive Charge updates', 'smartcoin-woo'),
             'label'       => __('Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks', 'smartcoin-woo'),
             'default'     => ($this->get_wc_request_url() . '&rand=' . $this->generateRandomString(20))
+          ),
+        'sc_track_debug' => array(
+            'type'        => 'checkbox',
+            'title'       => __('Enable/Disable', 'smartcoin-woo'),
+            'label'       => __('Enable debug mode that will create log in WooCommerce -> System Status -> Log', 'smartcoin-woo'),
+            'default'     => 'no'
           )
       );
   }
@@ -164,6 +172,15 @@ class Smartcoin extends WC_Payment_Gateway {
       \Smartcoin\Smartcoin::api_secret($this->api_secret);
 
       if($data['smartcoin_payment_method_type'] == 'credit_card'){
+
+        if($data['installments'] == '')
+          $data['installments'] = 1;
+
+        $logger = new WC_Logger();
+        $logger->add( 'Smartcoin', 'Amount: ' . $data['amount'] );
+        $logger->add( 'Smartcoin', 'Tokne: ' . $data['token'] );
+        $logger->add( 'Smartcoin', 'Installments: ' . $data['installments'] );
+
         $charge = \Smartcoin\Charge::create(array(
                   'amount' => $data['amount'],
                   'currency' => 'brl',

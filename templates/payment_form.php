@@ -62,7 +62,7 @@
   <p class="form-row form-row-first" style="width:150px;">
   <label>Código de Segurança <span class="required">*</span></label>
   <input class="input-text" type="text" data-smartcoin="cvc" style="width:65px;"/>
-    <?php if($this->allowInstallments){ ?>
+  <?php if($this->allowInstallments){ ?>
     <label>Parcelas<span class="required">*</span></label>
     <select name="smartcoin_installments" data-smartcoin="installments" >
       <?php
