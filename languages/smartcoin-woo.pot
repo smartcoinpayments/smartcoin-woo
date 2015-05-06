@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Smartcoin (payment Gateway)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: Fri May 01 2015 01:52:25 GMT-0300 (BRT)\n"
-"POT-Revision-Date: Fri May 01 2015 14:47:44 GMT-0300 (BRT)\n"
+"POT-Revision-Date: Wed May 06 2015 20:18:29 GMT-0300 (BRT)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -24,171 +24,125 @@ msgstr ""
 "esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
 "X-Generator: Loco - https://localise.biz/"
 
-#: ../smartcoin_gateway.php:49
+#: ../smartcoin_gateway.php:53
 msgid ""
 "<div class=\"error\"><p>Smartcoin test API is disable and force SSL option is "
 "disable. Please enable SSL and ensure your server has valid SSL certificate."
 "</p></div>"
 msgstr ""
 
-#: ../smartcoin_gateway.php:57
+#: ../smartcoin_gateway.php:61 ../smartcoin_gateway.php:122
 msgid "Enable/Disable"
 msgstr ""
 
-#: ../smartcoin_gateway.php:58
+#: ../smartcoin_gateway.php:62
 msgid "Enable Smartcoin Credit Card Payment"
 msgstr ""
 
-#: ../smartcoin_gateway.php:63
+#: ../smartcoin_gateway.php:67
 msgid "Test mode (sandbox)"
 msgstr ""
 
-#: ../smartcoin_gateway.php:64
+#: ../smartcoin_gateway.php:68
 msgid "Turn on the test mode"
 msgstr ""
 
-#: ../smartcoin_gateway.php:69
+#: ../smartcoin_gateway.php:73
 msgid "Show Radio Button"
 msgstr ""
 
-#: ../smartcoin_gateway.php:70
+#: ../smartcoin_gateway.php:74
 msgid "If you are using just Smartcoin as payment method, disable this option"
 msgstr ""
 
-#: ../smartcoin_gateway.php:74
+#: ../smartcoin_gateway.php:78
 msgid "Title"
 msgstr ""
 
-#: ../smartcoin_gateway.php:76
+#: ../smartcoin_gateway.php:80
 msgid "This controls the title which the user sees during checkout."
 msgstr ""
 
-#: ../smartcoin_gateway.php:77
+#: ../smartcoin_gateway.php:81
 msgid "Credit Card and Bank Slip"
 msgstr ""
 
-#: ../smartcoin_gateway.php:82
+#: ../smartcoin_gateway.php:86
 msgid "Test API Key"
 msgstr ""
 
-#: ../smartcoin_gateway.php:87
+#: ../smartcoin_gateway.php:91
 msgid "Test API Secret"
 msgstr ""
 
-#: ../smartcoin_gateway.php:92
+#: ../smartcoin_gateway.php:96
 msgid "Live API Key"
 msgstr ""
 
-#: ../smartcoin_gateway.php:97
+#: ../smartcoin_gateway.php:101
 msgid "Live API Secret"
 msgstr ""
 
-#: ../smartcoin_gateway.php:102
+#: ../smartcoin_gateway.php:106
 msgid "Allow Installments"
 msgstr ""
 
-#: ../smartcoin_gateway.php:103
+#: ../smartcoin_gateway.php:107
 msgid "yes"
 msgstr ""
 
-#: ../smartcoin_gateway.php:107
+#: ../smartcoin_gateway.php:111
 msgid "Number max of installments"
 msgstr ""
 
-#: ../smartcoin_gateway.php:112
+#: ../smartcoin_gateway.php:116
 msgid "Webhook URL to receive Charge updates"
 msgstr ""
 
-#: ../smartcoin_gateway.php:113
+#: ../smartcoin_gateway.php:117
 msgid "Inclue this url in Smart Manage -> Menu -> Settings -> Webhooks"
 msgstr ""
 
-#: ../smartcoin_gateway.php:184 ../smartcoin_gateway.php:206
+#: ../smartcoin_gateway.php:123
+msgid "Enable debug mode that will create log in WooCommerce -> System Status -> Log"
+msgstr ""
+
+#: ../smartcoin_gateway.php:199 ../smartcoin_gateway.php:221
 msgid "Payment error:"
 msgstr ""
 
-#: ../smartcoin_gateway.php:287
+#: ../smartcoin_gateway.php:302
 msgid "Pending payment"
 msgstr ""
 
-#: ../smartcoin_gateway.php:345
+#: ../smartcoin_gateway.php:360
 #, php-format
 msgid "%s Credit Card Refund failed because the Transaction ID is missing."
 msgstr ""
 
-#: ../smartcoin_gateway.php:374 ../smartcoin_gateway.php:386
+#: ../smartcoin_gateway.php:389 ../smartcoin_gateway.php:401
 #, php-format
 msgid "%s Credit Card Refund Failed with message: \"%s\""
 msgstr ""
 
-#: ../smartcoin_gateway.php:413
+#: ../smartcoin_gateway.php:428
 msgid "Paid successfully."
 msgstr ""
 
-#: ../smartcoin_gateway.php:435 ../woocommerce/checkout/thankyou.php:37
-msgid "Your bank slip bar code is:"
-msgstr ""
-
-#: ../templates/admin.php:6
-msgid "Smartcoin - Credit Card Payment"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:17
-msgid ""
-"Unfortunately your order cannot be processed as the originating "
-"bank/merchant has declined your transaction."
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:21
-msgid "Please attempt your purchase again or go to your account page."
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:23
-msgid "Please attempt your purchase again."
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:27
-msgid "Pay"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:29
-msgid "My Account"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:36
+#: ../templates/email_thankyou.php:4 ../templates/thankyou.php:4
 msgid ""
 "Thank you. Your order has been received. But we are awaiting the payment "
 "confirmation."
 msgstr ""
 
-#: ../woocommerce/checkout/thankyou.php:39
-msgid "Print Bank Slip"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:41 ../woocommerce/checkout/thankyou.php:72
+#: ../templates/email_thankyou.php:6 ../templates/thankyou.php:16
 msgid "Thank you. Your order has been received."
 msgstr ""
 
-#: ../woocommerce/checkout/thankyou.php:46
-msgid "Order Number:"
+#: ../templates/email_thankyou.php:11 ../templates/thankyou.php:7
+msgid "Your bank slip bar code is:"
 msgstr ""
 
-#: ../woocommerce/checkout/thankyou.php:50
-msgid "Date:"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:54
-msgid "Total:"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:59
-msgid "Payment Method:"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:60
-msgid "Bank Slip"
-msgstr ""
-
-#: ../woocommerce/checkout/thankyou.php:60
-msgid "Credit Card"
+#: ../templates/email_thankyou.php:15 ../templates/thankyou.php:11
+msgid "Print Bank Slip"
 msgstr ""

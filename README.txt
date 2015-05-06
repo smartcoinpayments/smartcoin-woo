@@ -37,15 +37,24 @@ This section describes how to install the plugin and get it working.
 2. Create account in Smartcoin (https://manage.smartcoin.com.br);
 3. Copy the Access Key to Smartcoin pulgin settings;
 
-== Screenshots ==
+== Frequently Asked Questions ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets 
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png` 
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+= How to create a Smartcoin Account =
+
+Go to the website https://smartcoin.com.br and sign up to Smartcoin.
+
+= Can I use the plugin without Smartcoin account =
+
+No. You should create a Smartcoin account in https://smartcoin.com.br
+
 
 == Changelog ==
+
+= 0.3.1
+* Integrate webhook to update the bank slip charge status
+* BugFix in Credit Card form
+* Improve the Thank You page to avoid crash previous layout
+* Improve the Email instructions layout
 
 = 0.2.0
 * Allow bank slip charge
