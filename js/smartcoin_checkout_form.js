@@ -4,21 +4,6 @@ var $form = $('form.checkout,form#order_review');
 var installments = 1;
 var card;
 
-var smartcoin_log = function() {
-  if(_smartcoin_track_debug) {
-    console.log('Nome: ' + $('input[data-smartcoin="name"]').val());
-    console.log('Número: ' + $('input[data-smartcoin="number"]').val());
-    console.log('Month: ' + $('select[data-smartcoin="exp_month"]').val());
-    console.log('Year: ' + $('select[data-smartcoin="exp_year"]').val());
-    console.log('CVC: ' + $('input[data-smartcoin="cvc"]').val());
-    console.log('Token: ' + $('input[name="smartcoin_token"]').val());
-    console.log('Session Id: ' + $('input[name="smartcoin_session_id"]').val());
-    console.log('User Id: ' + $('input[name="smartcoin_user_id"]').val());
-    console.log('API Key: ' + $('#smartcoin_api_key').data('apikey'));
-    console.log('Installments: ' + $('select[data-smartcoin="installments"'));
-  }
-}
-
 var smartcoin_payment_method_selected = function() {
   var result = 'credit_card';
   if($("#smartcoin_payment_method_bank_slip").attr("checked")) {
@@ -71,8 +56,6 @@ var smartcoin_response_handler = function(response) {
     $form.append($('<input type="hidden" name="smartcoin_installments" />').val(installments));
     $form.append($('<input type="hidden" name="smartcoin_token" />').val(response.id));
     
-    smartcoin_log();
-    
     $form.submit();
   }
 };
@@ -89,16 +72,14 @@ var smartcoin_charge_credit_card = function(form) {
     _user_id = $('#billing_email').val();
   }
 
+  form.append($('<input type="hidden" name="smartcoin_session_id" data-smartcoin="session_id" />').val(_session_id));
+  form.append($('<input type="hidden" name="smartcoin_user_id" data-smartcoin="user_id" />').val(_user_id));
+  $('form.checkout').find('[name=smartcoin_token]').remove();
+
   if($('form.checkout').find('[name=smartcoin_installments]')){
     installments = $('form.checkout').find('[name=smartcoin_installments]').val();
     $('form.checkout').find('[name=smartcoin_installments]').remove();
   }
-
-  form.append($('<input type="hidden" name="smartcoin_session_id" data-smartcoin="session_id" />').val(_session_id));
-  form.append($('<input type="hidden" name="smartcoin_user_id" data-smartcoin="user_id" />').val(_user_id));
-  $('form.checkout').find('[name=smartcoin_token]').remove();
-  
-  smartcoin_log();
 
   SmartCoin.set_api_key($('#smartcoin_api_key').data('apikey'));
   SmartCoin.create_token(form, smartcoin_response_handler);
