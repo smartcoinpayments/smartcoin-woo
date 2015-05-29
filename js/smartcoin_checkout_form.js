@@ -159,7 +159,7 @@ var initSmartcoinJS = function() {
   }
   
   $("input[name=smartcoin_payment_method]:radio").change(function() {
-    if($("#smartcoin_payment_method_credit_card").attr("checked")) {
+    if($("#smartcoin_payment_method_credit_card").attr("checked") === 'checked') {
       $("#smartcoin_credit_card_section").fadeIn();
       $("#smartcoin_bank_slip_section").fadeOut();
       $("#smartcoin_bank_slip_section").attr("checked", false);
