@@ -1,6 +1,5 @@
 $ = jQuery;
 var submitButtonOriginalColor;
-var $form;
 var installments = 1;
 var card;
 
@@ -47,16 +46,16 @@ var smartcoin_validate_payment_form = function(form) {
 
 var smartcoin_response_handler = function(response) {
   if (response.error) {
-    $form.find('.payment-errors').text(response.error.message);
-    $form.unblock();
+    $('form.checkout,form#order_review').find('.payment-errors').text(response.error.message);
+    $('form.checkout,form#order_review').unblock();
   } else {
     $('form.checkout').find('[name=smartcoin_session_id]').remove();
     $('form.checkout').find('[name=smartcoin_user_id]').remove();
     
-    $form.append($('<input type="hidden" name="smartcoin_installments" />').val(installments));
-    $form.append($('<input type="hidden" name="smartcoin_token" />').val(response.id));
+    $('form.checkout,form#order_review').append($('<input type="hidden" name="smartcoin_installments" />').val(installments));
+    $('form.checkout,form#order_review').append($('<input type="hidden" name="smartcoin_token" />').val(response.id));
     
-    $form.submit();
+    $('form.checkout,form#order_review').submit();
   }
 };
 
@@ -133,10 +132,10 @@ var smartcoin_setting_credit_card_form = function() {
     }
 
     if(smartcoin_payment_method_selected() === 'credit_card'){
-      smartcoin_charge_credit_card($form);
+      smartcoin_charge_credit_card($('form.checkout,form#order_review'));
     }
     else {
-      smartcoin_charge_bank_slip($form);
+      smartcoin_charge_bank_slip($('form.checkout,form#order_review'));
     }
     return false;
   });
@@ -168,7 +167,6 @@ var initSmartcoinJS = function() {
 }
 
 jQuery(document).ready(function($) {
-  $form = $('form.checkout,form#order_review');
   $('body').on('init_add_payment_method', initSmartcoinJS);
   $('form.checkout').on('checkout_place_order_' + $('#order_review input[name=payment_method]:checked').val() ,initSmartcoinJS);
   $('body').on('updated_checkout', initSmartcoinJS);
