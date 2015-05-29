@@ -1,6 +1,6 @@
 $ = jQuery;
 var submitButtonOriginalColor;
-var $form = $('form.checkout,form#order_review');
+var $form;
 var installments = 1;
 var card;
 
@@ -76,7 +76,7 @@ var smartcoin_charge_credit_card = function(form) {
   form.append($('<input type="hidden" name="smartcoin_user_id" data-smartcoin="user_id" />').val(_user_id));
   $('form.checkout').find('[name=smartcoin_token]').remove();
 
-  if($('form.checkout').find('[name=smartcoin_installments]')){
+  if($('form.checkout').find('[name=smartcoin_installments]').length > 0){
     installments = $('form.checkout').find('[name=smartcoin_installments]').val();
     $('form.checkout').find('[name=smartcoin_installments]').remove();
   }
@@ -168,6 +168,7 @@ var initSmartcoinJS = function() {
 }
 
 jQuery(document).ready(function($) {
+  $form = $('form.checkout,form#order_review');
   $('body').on('init_add_payment_method', initSmartcoinJS);
   $('form.checkout').on('checkout_place_order_' + $('#order_review input[name=payment_method]:checked').val() ,initSmartcoinJS);
   $('body').on('updated_checkout', initSmartcoinJS);

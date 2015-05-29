@@ -3,7 +3,7 @@
  * Plugin Name: Smartcoin (payment Gateway)
  * Plugin URI: https://smartcoin.com.br
  * Description: Provides payment method for credit card through Smartcoin to WooCommerce.
- * Version: 0.3.3
+ * Version: 0.3.4
  * Author: Arthur Granado
  * Author URI: https://smartcoin.com.br
  * License: GPL2
