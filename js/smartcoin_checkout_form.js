@@ -6,7 +6,7 @@ var configureForm = true;
 
 var smartcoin_payment_method_selected = function() {
   var result = 'credit_card';
-  if($("#smartcoin_payment_method_bank_slip").attr("checked")) {
+  if($("#smartcoin_payment_method_bank_slip").prop("checked")) {
     result = 'bank_slip';
   }
   return result;
@@ -159,7 +159,7 @@ var initSmartcoinJS = function() {
   }
   
   $("input[name=smartcoin_payment_method]:radio").change(function() {
-    if($("#smartcoin_payment_method_credit_card").attr("checked") === 'checked') {
+    if($("#smartcoin_payment_method_credit_card").prop("checked")) {
       $("#smartcoin_credit_card_section").fadeIn();
       $("#smartcoin_bank_slip_section").fadeOut();
       $("#smartcoin_bank_slip_section").attr("checked", false);
