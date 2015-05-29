@@ -14,7 +14,7 @@
 </section>
 
 <!-- Credit Card Form -->
-<input type="radio" id="smartcoin_payment_method_credit_card" name="smartcoin_payment_method" value="credit_card"> 
+<input type="radio" id="smartcoin_payment_method_credit_card" name="smartcoin_payment_method" value="credit_card" checked> 
 <label for="smartcoin_payment_method_credit_card">Cartão de Crédito</label></br>
 <section id="smartcoin_credit_card_section">
   <div class="form-row form-row-first smartcoin-card-wrapper" ></div>

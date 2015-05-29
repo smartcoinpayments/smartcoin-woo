@@ -147,7 +147,6 @@ var smartcoin_setting_credit_card_form = function() {
 };
 
 var initSmartcoinJS = function() {
-  $("#smartcoin_payment_method_credit_card").attr("checked", "checked");
   if(!_smartcoin_show_radio_button){
     $('input#payment_method_Smartcoin').hide();  
     $('label[for="payment_method_Smartcoin"]').hide();
