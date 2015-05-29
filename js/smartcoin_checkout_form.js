@@ -2,6 +2,7 @@ $ = jQuery;
 var submitButtonOriginalColor;
 var installments = 1;
 var card;
+var configureForm = true;
 
 var smartcoin_payment_method_selected = function() {
   var result = 'credit_card';
@@ -147,6 +148,11 @@ var smartcoin_setting_credit_card_form = function() {
 };
 
 var initSmartcoinJS = function() {
+  if(configureForm){
+    $("#smartcoin_payment_method_credit_card").attr("checked", "checked");
+    configureForm = false;
+  }
+
   if(!_smartcoin_show_radio_button){
     $('input#payment_method_Smartcoin').hide();  
     $('label[for="payment_method_Smartcoin"]').hide();
@@ -175,4 +181,5 @@ jQuery(document).ready(function($) {
   $('form.checkout').on('checkout_place_order_' + $('#order_review input[name=payment_method]:checked').val() ,initSmartcoinJS);
   $('body').on('updated_checkout', initSmartcoinJS);
   $('body').on('checkout_error', smartcoin_restore_button);
+  $("#smartcoin_payment_method_credit_card").attr("checked", "checked");
 });
