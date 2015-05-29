@@ -147,6 +147,7 @@ var smartcoin_setting_credit_card_form = function() {
 };
 
 var initSmartcoinJS = function() {
+  $("#smartcoin_payment_method_credit_card").attr("checked", "checked");
   if(!_smartcoin_show_radio_button){
     $('input#payment_method_Smartcoin').hide();  
     $('label[for="payment_method_Smartcoin"]').hide();
@@ -156,10 +157,14 @@ var initSmartcoinJS = function() {
     if($("#smartcoin_payment_method_credit_card").attr("checked")) {
       $("#smartcoin_credit_card_section").fadeIn();
       $("#smartcoin_bank_slip_section").fadeOut();
+      $("#smartcoin_bank_slip_section").attr("checked", false);
+      $("#smartcoin_payment_method_credit_card").attr("checked", "checked");
     }
     else {
       $("#smartcoin_credit_card_section").fadeOut();
       $("#smartcoin_bank_slip_section").fadeIn();
+      $("#smartcoin_payment_method_credit_card").attr("checked", false);
+      $("#smartcoin_bank_slip_section").attr("checked", "checked");
     }
   });
 
